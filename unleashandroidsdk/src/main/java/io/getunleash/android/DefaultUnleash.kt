@@ -172,6 +172,7 @@ class DefaultUnleash(
                 val backupDir = CacheDirectoryProvider(unleashConfig.localStorageConfig, androidContext)
                     .getCacheDirectory(BACKUP_DIR_NAME)
                 val localBackup = LocalBackup(backupDir)
+                localBackup.subscribeTo(cache.getUpdatesFlow())
                 unleashContextState.asStateFlow().takeWhile { !ready.get() }.collect { ctx ->
                     Log.d(TAG, "Loading state from backup for $ctx")
                     localBackup.loadFromDisc(unleashContextState.value)?.let { state ->
@@ -181,8 +182,6 @@ class DefaultUnleash(
                         } else {
                             Log.d(TAG, "Ignoring backup, Unleash is already ready")
                         }
-                        // subscribe to state changes after loading from backup
-                        localBackup.subscribeTo(cache.getUpdatesFlow())
                     }
                 }
             }
