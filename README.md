@@ -11,7 +11,7 @@ You can use this client with [Unleash Enterprise](https://www.getunleash.io/pric
 
 ## Getting started
 
-This is the Android SDK for [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api) provided by the [Unleash server](https://github.com/Unleash/unleash) or [Unleash Edge](https://github.com/Unleash/unleash-edge).
+This is the Android SDK for [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api) provided by the [Unleash server](https://github.com/Unleash/unleash) or [Unleash Edge](https://github.com/Unleash/unleash-edge). It is a lightweight SDK that allows you to connect to the Unleash Frontend API and fetch feature toggles.
 
 This supersedes the [previous Unleash Android Proxy SDK](https://github.com/Unleash/unleash-android-proxy-sdk/) this one is a an Android library instead of a Java library. 
 
@@ -29,7 +29,7 @@ You will require the SDK on your classpath, so go ahead and add it to your depen
 
 #### Gradle
 ```kotlin
-implementation("io.getunleash:unleash-android:"){unleash.sdk.version}
+implementation("io.getunleash:unleash-android:${unleash.sdk.version}")
 ```
 #### Maven
 
@@ -134,7 +134,7 @@ val toggles = listOf(
 instance.start(bootstrap = toggles)
 ```
 
-Alternatively, you can perform a query against the [frontend API](https://docs.getunleash.io/reference/front-end-api) using your HTTP client of choice and save the output as a json file. Then you can bootstrap Unleash with this file:
+Alternatively, you can perform a query against the [frontend API](https://docs.getunleash.io/reference/front-end-api) using your HTTP client of choice and save the output as a json file. Then you can tell Unleash to use this file to set up toggle states.
 
 ```kotlin
 val toggles = File("/tmp/proxyresponse.json")
@@ -170,11 +170,11 @@ unleash.getVariant("flag-with-variant").let { variant ->
 ```
 
 #### Example main activity
-In [the sample app](app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) we use this to display the state of a toggle on the [main activity](app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt).
+In [the sample app](app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) we use this to display the state of a toggle on the [main activity](app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt). We also configured a few event listeners to display how to use them.
 
 
 ## Default behavior
-If you don't provide an initial state, Unleash will use the default behavior for feature toggles with unknown state. This means that if a feature toggle is not found in the list of toggles, it will return false.
+If you don't provide an initial state, Unleash will use the default behavior for feature toggles with unknown state. This means that if a feature toggle is not found in the list of toggles, it will be disabled by default.
 
 ## Releasing
 
