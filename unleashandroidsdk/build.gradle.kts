@@ -106,11 +106,11 @@ publishing {
                 pom {
                     name.set("Unleash Android")
                     description.set("Android SDK for Unleash")
-                    url.set("https://gh.getunleash.io/unleash-android")
+                    url.set("https://gh.getunleash.io/unleash-android-sdk")
                     licenses {
                         license {
                             name.set("MIT License")
-                            url.set("https://raw.githubusercontent.com/Unleash/unleash-android/refs/heads/main/LICENSE")
+                            url.set("https://raw.githubusercontent.com/Unleash/unleash-android-sdk/refs/heads/main/LICENSE")
                         }
                     }
                     developers {
@@ -131,9 +131,9 @@ publishing {
                         }
                     }
                     scm {
-                        connection.set("scm:git:https://github.com/Unleash/unleash-android")
-                        developerConnection.set("scm:git:ssh://git@github.com:Unleash/unleash-android")
-                        url.set("https://github.com/Unleash/unleash-android")
+                        connection.set("scm:git:https://github.com/Unleash/unleash-android-sdk")
+                        developerConnection.set("scm:git:ssh://git@github.com:Unleash/unleash-android-sdk")
+                        url.set("https://github.com/Unleash/unleash-android-sdk")
                     }
                 }
             }
