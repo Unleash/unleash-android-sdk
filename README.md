@@ -1,4 +1,9 @@
 # Unleash Android SDK
+
+Unleash is a private, secure, and scalable [feature management platform](https://www.getunleash.io/) built to reduce the risk of releasing new features and accelerate software development. This Android SDK is designed to help you integrate with Unleash and use feature flags inside your application.
+
+You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=java) or [Unleash Open Source](https://github.com/Unleash/unleash).
+
 [![Coverage Status](https://coveralls.io/repos/github/Unleash/unleash-android/badge.svg?branch=main)](https://coveralls.io/github/Unleash/unleash-android?branch=main)
 [![main](https://github.com/Unleash/unleash-android/actions/workflows/build.yaml/badge.svg)](https://github.com/Unleash/unleash-android/actions/workflows/build.yaml)
 [![latest](https://badgen.net/maven/v/maven-central/io.getunleash/unleash-android)](https://search.maven.org/search?q=g:io.getunleash%20AND%20a:unleash-android)
@@ -6,7 +11,7 @@
 
 ## Getting started
 
-This is the Android SDK for [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api) provided by the [Unleash server](https://github.com/Unleash/unleash) or [Unleash Edge](https://github.com/Unleash/unleash-edge). It is a lightweight SDK that allows you to connect to the Unleash Frontend API and fetch feature toggles.
+This is the Android SDK for [Unleash Frontend API](https://docs.getunleash.io/reference/front-end-api) provided by the [Unleash server](https://github.com/Unleash/unleash) or [Unleash Edge](https://github.com/Unleash/unleash-edge).
 
 This supersedes the [previous Unleash Android Proxy SDK](https://github.com/Unleash/unleash-android-proxy-sdk/) this one is a an Android library instead of a Java library. 
 
@@ -24,7 +29,7 @@ You will require the SDK on your classpath, so go ahead and add it to your depen
 
 #### Gradle
 ```kotlin
-implementation("io.getunleash:unleash-android:${unleash.sdk.version}")
+implementation("io.getunleash:unleash-android:"){unleash.sdk.version}
 ```
 #### Maven
 
@@ -129,7 +134,7 @@ val toggles = listOf(
 instance.start(bootstrap = toggles)
 ```
 
-Alternatively, you can perform a query against the [frontend API](https://docs.getunleash.io/reference/front-end-api) using your HTTP client of choice and save the output as a json file. Then you can tell Unleash to use this file to set up toggle states.
+Alternatively, you can perform a query against the [frontend API](https://docs.getunleash.io/reference/front-end-api) using your HTTP client of choice and save the output as a json file. Then you can bootstrap Unleash with this file:
 
 ```kotlin
 val toggles = File("/tmp/proxyresponse.json")
@@ -165,11 +170,11 @@ unleash.getVariant("flag-with-variant").let { variant ->
 ```
 
 #### Example main activity
-In [the sample app](app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) we use this to display the state of a toggle on the [main activity](app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt). We also configured a few event listeners to display how to use them.
+In [the sample app](app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) we use this to display the state of a toggle on the [main activity](app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt).
 
 
 ## Default behavior
-If you don't provide an initial state, Unleash will use the default behavior for feature toggles with unknown state. This means that if a feature toggle is not found in the list of toggles, it will be disabled by default.
+If you don't provide an initial state, Unleash will use the default behavior for feature toggles with unknown state. This means that if a feature toggle is not found in the list of toggles, it will return false.
 
 ## Releasing
 
