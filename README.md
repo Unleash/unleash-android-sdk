@@ -2,7 +2,7 @@
 
 Unleash is a private, secure, and scalable [feature management platform](https://www.getunleash.io/) built to reduce the risk of releasing new features and accelerate software development. This Android SDK is designed to help you integrate with Unleash and use feature flags inside your application.
 
-You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=java) or [Unleash Open Source](https://github.com/Unleash/unleash).
+You can use this client with [Unleash Enterprise](https://www.getunleash.io/pricing?utm_source=readme&utm_medium=android) or [Unleash Open Source](https://github.com/Unleash/unleash).
 
 [![Coverage Status](https://coveralls.io/repos/github/Unleash/unleash-android/badge.svg?branch=main)](https://coveralls.io/github/Unleash/unleash-android?branch=main)
 [![main](https://github.com/Unleash/unleash-android/actions/workflows/build.yaml/badge.svg)](https://github.com/Unleash/unleash-android/actions/workflows/build.yaml)
