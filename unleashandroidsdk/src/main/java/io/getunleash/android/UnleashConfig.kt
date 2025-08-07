@@ -47,7 +47,7 @@ data class UnleashConfig(
             "User-Agent" to appName,
             "UNLEASH-INSTANCEID" to instanceId,
             "UNLEASH-CONNECTION-ID" to instanceId,
-            "UNLEASH-SDK" to "unleash-client-android:" + BuildConfig.VERSION,
+            "UNLEASH-SDK" to "unleash-android-sdk:" + BuildConfig.VERSION,
         ))
     }
 
