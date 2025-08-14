@@ -26,7 +26,7 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 moshi-kotlin = { group = "com.squareup.moshi", name="moshi-kotlin", version.ref = "moshi" }
 moshi-adapters = { group = "com.squareup.moshi", name="moshi-adapters", version.ref = "moshi" }
 robolectric-test = { group = "org.robolectric", name = "robolectric", version = "4.13" }
-awaitility = { group = "org.awaitility", name = "awaitility", version = "4.2.1" }
+awaitility = { group = "org.awaitility", name = "awaitility", version = "4.3.0" }
 
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-mockserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
