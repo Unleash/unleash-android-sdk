@@ -38,10 +38,6 @@ class NetworkStatusHelper(private val context: Context) {
                 listener.onAvailable()
             }
 
-            override fun onUnavailable() {
-                listener.onLost()
-            }
-
             override fun onLost(network: Network) {
                 availableNetworks -= network
                 if (availableNetworks.isEmpty()) {
