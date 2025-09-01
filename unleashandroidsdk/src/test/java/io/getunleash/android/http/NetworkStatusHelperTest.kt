@@ -10,6 +10,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -108,6 +109,7 @@ class NetworkStatusHelperTest : BaseTest() {
     @Config(sdk = [23])
     fun `can register a network listener with API level above 23`() {
         val network = mock(Network::class.java)
+        val network2 = mock(Network::class.java)
         val context = contextWithNetwork(
             network,
             NetworkCapabilities.NET_CAPABILITY_VALIDATED,
@@ -121,10 +123,12 @@ class NetworkStatusHelperTest : BaseTest() {
 
         networkStatusHelper.networkCallbacks[0].onAvailable(network)
         verify(listener).onAvailable()
+        networkStatusHelper.networkCallbacks[0].onAvailable(network2)
+        verify(listener, times(2)).onAvailable()
         networkStatusHelper.networkCallbacks[0].onLost(network)
+        verify(listener, never()).onLost()
+        networkStatusHelper.networkCallbacks[0].onLost(network2)
         verify(listener).onLost()
-        networkStatusHelper.networkCallbacks[0].onUnavailable()
-        verify(listener, times(2)).onLost()
     }
 
     private fun contextWithNetwork(network: Network?, vararg capabilities: Int): Context {

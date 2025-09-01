@@ -20,6 +20,8 @@ class NetworkStatusHelper(val context: Context) {
 
     internal val networkCallbacks = mutableListOf<ConnectivityManager.NetworkCallback>()
 
+    private val availableNetworks = mutableSetOf<Network>()
+
     fun registerNetworkListener(listener: NetworkListener) {
         val connectivityManager = getConnectivityManager() ?: return
         val requestBuilder = NetworkRequest.Builder()
@@ -32,6 +34,7 @@ class NetworkStatusHelper(val context: Context) {
         // wrap the listener in a NetworkCallback so the listener doesn't have to know about Android specifics
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
+                availableNetworks += network
                 listener.onAvailable()
             }
 
@@ -40,7 +43,10 @@ class NetworkStatusHelper(val context: Context) {
             }
 
             override fun onLost(network: Network) {
-                listener.onLost()
+                availableNetworks -= network
+                if (availableNetworks.isEmpty()) {
+                    listener.onLost()
+                }
             }
         }
 
