@@ -13,7 +13,7 @@ interface NetworkListener {
     fun onLost()
 }
 
-class NetworkStatusHelper(val context: Context) {
+class NetworkStatusHelper(private val context: Context) {
     companion object {
         private const val TAG = "NetworkState"
     }
@@ -54,7 +54,7 @@ class NetworkStatusHelper(val context: Context) {
         networkCallbacks += networkCallback
     }
 
-    fun close () {
+    fun close() {
         val connectivityManager = getConnectivityManager() ?: return
         networkCallbacks.forEach {
             connectivityManager.unregisterNetworkCallback(it)
