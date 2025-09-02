@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.moshi.kotlin)
     implementation(libs.moshi.adapters)
+    implementation(libs.kotlinx.immutable)
     api(libs.okhttp)
 
     testImplementation(libs.junit)
