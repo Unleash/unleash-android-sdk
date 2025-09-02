@@ -175,7 +175,6 @@ $dokka.location:io.getunleash.android.http/NetworkStatusHelper.Companion///Point
 $dokka.location:io.getunleash.android.http/NetworkStatusHelper///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-network-status-helper/index.html
 $dokka.location:io.getunleash.android.http/NetworkStatusHelper/NetworkStatusHelper/#android.content.Context/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-network-status-helper/-network-status-helper.html
 $dokka.location:io.getunleash.android.http/NetworkStatusHelper/close/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-network-status-helper/close.html
-$dokka.location:io.getunleash.android.http/NetworkStatusHelper/context/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-network-status-helper/context.html
 $dokka.location:io.getunleash.android.http/NetworkStatusHelper/isAvailable/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-network-status-helper/is-available.html
 $dokka.location:io.getunleash.android.http/NetworkStatusHelper/registerNetworkListener/#io.getunleash.android.http.NetworkListener/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-network-status-helper/register-network-listener.html
 $dokka.location:io.getunleash.android.http/Throttler.Companion///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/-companion/index.html
