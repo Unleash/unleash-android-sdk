@@ -31,6 +31,7 @@ import io.getunleash.android.metrics.NoOpMetrics
 import io.getunleash.android.polling.UnleashFetcher
 import io.getunleash.android.tasks.DataJob
 import io.getunleash.android.tasks.LifecycleAwareTaskManager
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +48,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import okhttp3.internal.toImmutableList
 import java.io.File
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
