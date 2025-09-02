@@ -3,6 +3,7 @@ package io.getunleash.android
 import android.content.Context
 import androidx.lifecycle.Lifecycle
 import io.getunleash.android.backup.LocalBackup
+import io.getunleash.android.backup.TestLocalBackup
 import io.getunleash.android.data.ImpressionEvent
 import io.getunleash.android.data.Toggle
 import io.getunleash.android.data.UnleashContext
@@ -15,7 +16,6 @@ import io.getunleash.android.polling.Status
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.fail
 import org.assertj.core.groups.Tuple
 import org.awaitility.Awaitility.await
 import org.junit.Assert
@@ -23,6 +23,7 @@ import org.junit.Test
 import org.mockito.Mockito.mock
 import org.robolectric.shadows.ShadowLog
 import java.io.File
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.createTempDirectory
 
@@ -606,5 +607,124 @@ class DefaultUnleashTest : BaseTest() {
             }
         })
         await().atMost(1, TimeUnit.SECONDS).until { readyState }
+    }
+
+    @Test
+    fun `when fetch toggles happens before load from local backup, upstream data is not overridden by the backup`() {
+        val backupFile = this::class.java.classLoader?.getResource("unleash-state.json")!!.path
+        val tmpDir = createTempDirectory().toFile()
+        File(backupFile).copyTo(File(tmpDir, LocalBackup.STATE_BACKUP_FILE))
+
+        val server = MockWebServer()
+        server.enqueue(
+            MockResponse().setBody(
+                this::class.java.classLoader?.getResource("sample-response.json")!!.readText()
+            )
+        )
+
+        val inspectableCache = InspectableCache()
+        val backupStartLatch = CountDownLatch(1)
+        val writeCountingBackup = TestLocalBackup(tmpDir, backupStartLatch)
+        val localFactory: (File) -> TestLocalBackup = { dir -> writeCountingBackup }
+
+        val unleash = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = UnleashConfig.newBuilder("test-android-app")
+                .proxyUrl(server.url("").toString())
+                .clientKey("key-123")
+                .pollingStrategy.enabled(false)
+                .metricsStrategy.enabled(false)
+                .localStorageConfig.enabled(true)
+                .localStorageConfig.dir(tmpDir.path)
+                .build(),
+            cacheImpl = inspectableCache,
+            unleashContext = UnleashContext(userId = "123"),
+            lifecycle = mock(Lifecycle::class.java),
+            // internal constructor overload available in-module to inject test factories
+            localBackupFactory = localFactory,
+        )
+
+        unleash.start()
+        unleash.refreshTogglesNowAsync()
+
+        await().atMost(5, TimeUnit.SECONDS).until { unleash.isReady() }
+        assertThat(inspectableCache.toggles).hasSize(8) // from sample-response.json
+
+        // validate the backup file was updated
+        assertThat(writeCountingBackup.writeCalls).isEqualTo(1)
+        // now allow the backup load to proceed; it should subscribe to cache updates and write the latest state
+        backupStartLatch.countDown()
+
+        val backupFileOnDisc = File(tmpDir, LocalBackup.STATE_BACKUP_FILE)
+        // wait for the backup writer to update the file
+        await().atMost(3, TimeUnit.SECONDS).untilAsserted {
+            assertThat(backupFileOnDisc.exists()).isTrue()
+            val backupContent = backupFileOnDisc.readText(Charsets.UTF_8)
+            assertThat(backupContent).isNotEmpty()
+            assertThat(backupContent).doesNotContain("ff1") // from the old backup
+            assertThat(backupContent).contains("AwesomeDemo") // still contains the data from the latest fetch
+        }
+        // validate the backup file was not overridden by the old data
+        assertThat(writeCountingBackup.writeCalls).isEqualTo(1)
+        assertThat(inspectableCache.toggles).hasSize(8) // still from sample-response.json
+    }
+
+    @Test
+    fun `when fetch toggles happens after load from local backup, the local backup is updated`() {
+        val backupFile = this::class.java.classLoader?.getResource("unleash-state.json")!!.path
+        val tmpDir = createTempDirectory().toFile()
+        File(backupFile).copyTo(File(tmpDir, LocalBackup.STATE_BACKUP_FILE))
+
+        val server = MockWebServer()
+        server.enqueue(
+            MockResponse().setBody(
+                this::class.java.classLoader?.getResource("sample-response.json")!!.readText()
+            )
+        )
+
+        val inspectableCache = InspectableCache()
+        val backupStartLatch = CountDownLatch(1)
+        val writeCountingBackup = TestLocalBackup(tmpDir, backupStartLatch)
+        val localFactory: (File) -> TestLocalBackup = { dir -> writeCountingBackup }
+
+        val unleash = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = UnleashConfig.newBuilder("test-android-app")
+                .proxyUrl(server.url("").toString())
+                .clientKey("key-123")
+                .pollingStrategy.enabled(false)
+                .metricsStrategy.enabled(false)
+                .localStorageConfig.enabled(true)
+                .localStorageConfig.dir(tmpDir.path)
+                .build(),
+            cacheImpl = inspectableCache,
+            unleashContext = UnleashContext(userId = "123"),
+            lifecycle = mock(Lifecycle::class.java),
+            // internal constructor overload available in-module to inject test factories
+            localBackupFactory = localFactory,
+        )
+
+        unleash.start()
+        backupStartLatch.countDown() // allow loading from backup
+
+        await().atMost(5, TimeUnit.SECONDS).until { unleash.isReady() }
+        assertThat(inspectableCache.toggles).hasSize(3) // from the backup file
+
+        // backup should have been loaded, but not yet updated
+        assertThat(writeCountingBackup.writeCalls).isEqualTo(0)
+        // now sync from server again; it should update the backup with the same data
+        unleash.refreshTogglesNow()
+
+        val backupFileOnDisc = File(tmpDir, LocalBackup.STATE_BACKUP_FILE)
+        // wait for the backup writer to update the file
+        await().atMost(3, TimeUnit.SECONDS).untilAsserted {
+            assertThat(backupFileOnDisc.exists()).isTrue()
+            val backupContent = backupFileOnDisc.readText(Charsets.UTF_8)
+            assertThat(backupContent).isNotEmpty()
+            assertThat(backupContent).doesNotContain("ff1") // from the old backup
+            assertThat(backupContent).contains("AwesomeDemo") // still contains the data from the latest fetch
+        }
+        // validate the backup file was not overridden by the old data
+        assertThat(writeCountingBackup.writeCalls).isEqualTo(1)
     }
 }

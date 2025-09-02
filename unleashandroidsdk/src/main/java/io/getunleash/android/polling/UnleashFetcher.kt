@@ -11,6 +11,7 @@ import io.getunleash.android.errors.ServerException
 import io.getunleash.android.events.HeartbeatEvent
 import io.getunleash.android.http.Throttler
 import io.getunleash.android.unleashScope
+import kotlinx.coroutines.CoroutineScope
 import java.io.Closeable
 import java.io.IOException
 import java.util.concurrent.TimeUnit
