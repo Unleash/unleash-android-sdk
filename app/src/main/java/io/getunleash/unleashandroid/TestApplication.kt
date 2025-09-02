@@ -10,7 +10,7 @@ import io.getunleash.android.events.UnleashReadyListener
 import io.getunleash.android.events.UnleashStateListener
 import java.util.Date
 
-const val initialFlagValue = "flag-1"
+const val initialFlagValue = "unleash-android-test"
 const val initialUserId = "123"
 object UnleashStats {
     var readySince: Date? = null

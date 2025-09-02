@@ -572,4 +572,39 @@ class DefaultUnleashTest : BaseTest() {
         await().atMost(3, TimeUnit.SECONDS).until { readyState }
         assertThat(server.requestCount).isEqualTo(1)
     }
+
+    @Test
+    fun `is ready even when there's no is ready listener`() {
+        val server = MockWebServer()
+        server.enqueue(
+            MockResponse().setBody(
+                this::class.java.classLoader?.getResource("sample-response.json")!!.readText()
+            )
+        )
+
+        val unleash = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = UnleashConfig.newBuilder("test-android-app")
+                .proxyUrl(server.url("").toString())
+                .clientKey("key-123")
+                .pollingStrategy.enabled(false)
+                .metricsStrategy.enabled(false)
+                .localStorageConfig.enabled(false)
+                .delayedInitialization(false)
+                .build(),
+            unleashContext = UnleashContext(userId = "123"),
+            lifecycle = mock(Lifecycle::class.java),
+        )
+        unleash.refreshTogglesNow()
+        await().atMost(3, TimeUnit.SECONDS).until { unleash.isReady() }
+        assertThat(server.requestCount).isEqualTo(1)
+
+        var readyState = false
+        unleash.addUnleashEventListener(object : UnleashReadyListener {
+            override fun onReady() {
+                readyState = true
+            }
+        })
+        await().atMost(1, TimeUnit.SECONDS).until { readyState }
+    }
 }

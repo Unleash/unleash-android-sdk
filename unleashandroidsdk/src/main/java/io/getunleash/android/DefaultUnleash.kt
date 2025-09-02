@@ -130,6 +130,9 @@ class DefaultUnleash(
         if (unleashConfig.pollingStrategy.enabled) {
             fetcher.startWatchingContext()
         }
+        coroutineScope.launch {
+            readyOnFeaturesReceived()
+        }
         cache.subscribeTo(fetcher.getFeaturesReceivedFlow())
         lifecycle.addObserver(taskManager)
         if (bootstrapFile != null && bootstrapFile.exists()) {
@@ -286,12 +289,7 @@ class DefaultUnleash(
     override fun addUnleashEventListener(listener: UnleashListener) {
 
         if (listener is UnleashReadyListener) coroutineScope.launch {
-            cache.getUpdatesFlow().first{
-                true
-            }
-            if (ready.compareAndSet(false, true)) {
-                Log.d(TAG, "Unleash state changed to ready")
-            }
+            readyOnFeaturesReceived()
             Log.d(TAG, "Notifying UnleashReadyListener")
             listener.onReady()
         }
@@ -318,6 +316,16 @@ class DefaultUnleash(
                     listener.togglesUpdated()
                 }
             }
+        }
+    }
+
+    private suspend fun readyOnFeaturesReceived() {
+        val first = cache.getUpdatesFlow().first { it ->
+            it.toggles.isNotEmpty()
+        }
+        Log.d(TAG, "Received first cache update: $first")
+        if (ready.compareAndSet(false, true)) {
+            Log.d(TAG, "Unleash state changed to ready")
         }
     }
 
