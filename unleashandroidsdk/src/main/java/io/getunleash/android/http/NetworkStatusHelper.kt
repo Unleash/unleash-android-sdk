@@ -13,12 +13,14 @@ interface NetworkListener {
     fun onLost()
 }
 
-class NetworkStatusHelper(val context: Context) {
+class NetworkStatusHelper(private val context: Context) {
     companion object {
         private const val TAG = "NetworkState"
     }
 
     internal val networkCallbacks = mutableListOf<ConnectivityManager.NetworkCallback>()
+
+    private val availableNetworks = mutableSetOf<Network>()
 
     fun registerNetworkListener(listener: NetworkListener) {
         val connectivityManager = getConnectivityManager() ?: return
@@ -32,15 +34,15 @@ class NetworkStatusHelper(val context: Context) {
         // wrap the listener in a NetworkCallback so the listener doesn't have to know about Android specifics
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
+                availableNetworks += network
                 listener.onAvailable()
             }
 
-            override fun onUnavailable() {
-                listener.onLost()
-            }
-
             override fun onLost(network: Network) {
-                listener.onLost()
+                availableNetworks -= network
+                if (availableNetworks.isEmpty()) {
+                    listener.onLost()
+                }
             }
         }
 
@@ -48,7 +50,7 @@ class NetworkStatusHelper(val context: Context) {
         networkCallbacks += networkCallback
     }
 
-    fun close () {
+    fun close() {
         val connectivityManager = getConnectivityManager() ?: return
         networkCallbacks.forEach {
             connectivityManager.unregisterNetworkCallback(it)
