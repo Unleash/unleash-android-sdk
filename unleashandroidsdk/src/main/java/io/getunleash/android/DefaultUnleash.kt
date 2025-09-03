@@ -73,6 +73,29 @@ class DefaultUnleash(
         internal const val BACKUP_DIR_NAME = "unleash_backup"
     }
 
+    // allow tests in the same module to inject a custom LocalBackup for deterministic behavior
+    private var localBackupFactory: (File) -> LocalBackup = { dir -> LocalBackup(dir) }
+
+    // Internal constructor overload allowing injection of both localBackupFactory and fetcherFactory
+    internal constructor(
+        androidContext: Context,
+        unleashConfig: UnleashConfig,
+        unleashContext: UnleashContext = UnleashContext(),
+        cacheImpl: ToggleCache = InMemoryToggleCache(),
+        eventListeners: List<UnleashListener> = emptyList(),
+        lifecycle: Lifecycle = getLifecycle(androidContext),
+        localBackupFactory: (File) -> LocalBackup,
+    ) : this(
+        androidContext,
+        unleashConfig,
+        unleashContext,
+        cacheImpl,
+        eventListeners,
+        lifecycle,
+    ) {
+        this.localBackupFactory = localBackupFactory
+    }
+
     private val unleashContextState = MutableStateFlow(unleashContext)
     private val metrics: MetricsHandler
     private val taskManager: LifecycleAwareTaskManager
@@ -172,9 +195,12 @@ class DefaultUnleash(
     private fun initializeLocalBackup() {
         coroutineScope.launch {
             withContext(Dispatchers.IO) {
-                val backupDir = CacheDirectoryProvider(unleashConfig.localStorageConfig, androidContext)
-                    .getCacheDirectory(BACKUP_DIR_NAME)
-                val localBackup = LocalBackup(backupDir)
+                val backupDir =
+                    CacheDirectoryProvider(unleashConfig.localStorageConfig, androidContext)
+                        .getCacheDirectory(BACKUP_DIR_NAME)
+                val localBackup = localBackupFactory(backupDir)
+                // subscribe to feature updates from upstream
+                localBackup.subscribeTo(fetcher.getFeaturesReceivedFlow())
                 unleashContextState.asStateFlow().takeWhile { !ready.get() }.collect { ctx ->
                     Log.d(TAG, "Loading state from backup for $ctx")
                     localBackup.loadFromDisc(unleashContextState.value)?.let { state ->
@@ -184,8 +210,6 @@ class DefaultUnleash(
                         } else {
                             Log.d(TAG, "Ignoring backup, Unleash is already ready")
                         }
-                        // subscribe to state changes after loading from backup
-                        localBackup.subscribeTo(cache.getUpdatesFlow())
                     }
                 }
             }

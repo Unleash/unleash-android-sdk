@@ -1,7 +1,6 @@
 package io.getunleash.android.data
 
 import io.getunleash.android.UnleashConfig
-import okhttp3.OkHttpClient
 
 /**
  * @property enabled Whether the strategy is enabled or not. (Optional - Defaults to true)

@@ -21,7 +21,7 @@ data class BackupState(val contextId: String, val toggles: Map<String, Toggle>)
  * Because it only keeps the last state, it also saves the context id, and uses it to verify the context
  * is the same when loading the state from disc.
  */
-class LocalBackup(
+open class LocalBackup(
     private val localDir: File,
     private var lastContext: UnleashContext? = null
 ) {
@@ -46,7 +46,7 @@ class LocalBackup(
         }
     }
 
-    private fun writeToDisc(state: UnleashState) {
+    open fun writeToDisc(state: UnleashState) {
         try {
             // write only the last state
             val contextBackup = File(localDir.absolutePath, STATE_BACKUP_FILE)
@@ -64,7 +64,7 @@ class LocalBackup(
         }
     }
 
-    fun loadFromDisc(context: UnleashContext): UnleashState? {
+    open fun loadFromDisc(context: UnleashContext): UnleashState? {
         val stateBackup = File(localDir.absolutePath, STATE_BACKUP_FILE)
         try {
             if (stateBackup.exists()) {
