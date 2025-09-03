@@ -65,7 +65,7 @@
   <div class="breadcrumbs"><a href="../../../index.html">Unleash Android SDK</a><span class="delimiter">/</span><a href="../index.html">io.getunleash.android.backup</a><span class="delimiter">/</span><span class="current">LocalBackup</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Local</span><wbr></wbr><span><span>Backup</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">LocalBackup</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">localDir<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/io/File.html">File</a><span class="token punctuation">, </span></span><span class="parameter ">lastContext<span class="token operator">: </span><a href="../../io.getunleash.android.data/-unleash-context/index.html">UnleashContext</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><p class="paragraph">Local backup of the last state of the Unleash SDK.</p><p class="paragraph">Because it only keeps the last state, it also saves the context id, and uses it to verify the context is the same when loading the state from disc.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">class </span><a href="index.html">LocalBackup</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">localDir<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/java/io/File.html">File</a><span class="token punctuation">, </span></span><span class="parameter ">lastContext<span class="token operator">: </span><a href="../../io.getunleash.android.data/-unleash-context/index.html">UnleashContext</a><span class="token operator">?</span><span class="token operator"> = </span>null</span></span><span class="token punctuation">)</span></div><p class="paragraph">Local backup of the last state of the Unleash SDK.</p><p class="paragraph">Because it only keeps the last state, it also saves the context id, and uses it to verify the context is the same when loading the state from disc.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
@@ -120,7 +120,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="load-from-disc.html"><span class="token function">loadFromDisc</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../io.getunleash.android.data/-unleash-context/index.html">UnleashContext</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.getunleash.android.data/-unleash-state/index.html">UnleashState</a><span class="token operator">?</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="load-from-disc.html"><span class="token function">loadFromDisc</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../io.getunleash.android.data/-unleash-context/index.html">UnleashContext</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../io.getunleash.android.data/-unleash-state/index.html">UnleashState</a><span class="token operator">?</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -136,6 +136,21 @@
               <div>
                 <div class="title">
                   <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">fun </span><a href="subscribe-to.html"><span class="token function">subscribeTo</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><span data-unresolved-link="kotlinx.coroutines.flow/Flow///PointingToDeclaration/">Flow</span><span class="token operator">&lt;</span><a href="../../io.getunleash.android.data/-unleash-state/index.html">UnleashState</a><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1590609410%2FFunctions%2F-1069558929" anchor-label="writeToDisc" id="1590609410%2FFunctions%2F-1069558929" data-filterable-set=":unleashandroidsdk:dokkaHtml/release"></a>
+          <div class="table-row" data-filterable-current=":unleashandroidsdk:dokkaHtml/release" data-filterable-set=":unleashandroidsdk:dokkaHtml/release">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="write-to-disc.html"><span>write</span><wbr></wbr><span>To</span><wbr></wbr><span><span>Disc</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1590609410%2FFunctions%2F-1069558929"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="write-to-disc.html"><span class="token function">writeToDisc</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">state<span class="token operator">: </span><a href="../../io.getunleash.android.data/-unleash-state/index.html">UnleashState</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
