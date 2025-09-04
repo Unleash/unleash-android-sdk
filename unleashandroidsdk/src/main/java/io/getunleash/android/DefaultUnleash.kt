@@ -287,7 +287,7 @@ class DefaultUnleash(
         if (started.get()) {
             runBlocking {
                 withContext(Dispatchers.IO) {
-                    fetcher.refreshTogglesWithContext(context)
+                    fetcher.refreshTogglesIfContextChanged(context)
                 }
             }
         }
@@ -299,7 +299,7 @@ class DefaultUnleash(
         if (started.get()) {
             runBlocking {
                 withTimeout(timeout) {
-                    fetcher.refreshTogglesWithContext(context)
+                    fetcher.refreshTogglesIfContextChanged(context)
                 }
             }
         }
