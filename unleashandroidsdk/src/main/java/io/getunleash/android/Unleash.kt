@@ -29,6 +29,9 @@ interface Unleash: Closeable {
 
     fun addUnleashEventListener(listener: UnleashListener)
 
+    // Added to allow removing a previously added listener and stop its coroutines
+    fun removeUnleashEventListener(listener: UnleashListener)
+
     /**
      * This function forces a refresh of the toggles from the server and wait until the refresh is complete or failed.
      * Usually, this is done automatically in the background, but you can call this function to force a refresh.
