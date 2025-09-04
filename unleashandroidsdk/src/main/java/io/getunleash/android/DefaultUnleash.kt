@@ -112,9 +112,6 @@ class DefaultUnleash(
         extraBufferCapacity = 1000,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-
-    // Map of registered listeners to the coroutine Jobs spawned to service them.
-    // We use a ConcurrentHashMap and thread-safe lists so add/remove can be called from any thread.
     private val listenerJobs = ConcurrentHashMap<UnleashListener, CopyOnWriteArrayList<Job>>()
 
     init {
@@ -317,9 +314,7 @@ class DefaultUnleash(
         unleashContextState.value = context
     }
 
-    // helper to register jobs created for a listener
     private fun registerListenerJob(listener: UnleashListener, job: Job) {
-        // computeIfAbsent requires API 24+, so use putIfAbsent which works on API 21.
         var list = listenerJobs[listener]
         if (list == null) {
             val newList = CopyOnWriteArrayList<Job>()
