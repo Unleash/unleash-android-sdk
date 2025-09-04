@@ -115,3 +115,80 @@ unleash.start()
 
 #### Updating class references
 Most of the classes have been moved to `io.getunleash.android` package. Update the import statements in your classes.
+
+### Event listeners — migrating from old PollingModes callbacks to fine-grained listeners
+
+In the old SDK it was common to register a callback directly on the polling mode, for example:
+
+**Old SDK**
+```kotlin
+val config = UnleashConfig.newBuilder()
+.pollingMode(
+    PollingModes.autoPoll(300) {
+        // process toggles when they arrive (acts as a listener)
+    }
+)
+```
+
+The new SDK uses a set of small, focused listener interfaces instead of a single polling callback. Mapping guidance:
+
+- If you used the polling-mode callback to react when toggles were updated, use UnleashFetcherHeartbeatListener.togglesUpdated() or UnleashStateListener.onStateChanged(). The heartbeat listener reports fetch lifecycle events (success / not-modified / error) and is closest to the old poll callback semantics for "toggles received".
+- If you only needed to know when the SDK is ready with the initial state, use UnleashReadyListener.onReady(). This fires once when the first non-empty state has been received or loaded from bootstrap/backup.
+- If you need impression events (user exposure data), implement UnleashImpressionEventListener.onImpression().
+
+Registering listeners
+- At initialization time you can pass listeners to start():
+
+```kotlin
+val unleash = DefaultUnleash(
+    androidContext = context,
+    unleashConfig = unleashConfig,
+    unleashContext = unleashContext
+)
+
+unleash.start(
+    eventListeners = listOf(object : UnleashFetcherHeartbeatListener {
+        override fun togglesUpdated() { /* toggles were refreshed successfully */ }
+        override fun togglesChecked() { /* 304 / not modified */ }
+        override fun onError(event: HeartbeatEvent) { /* error while fetching */ }
+    })
+)
+```
+
+- Or register them at runtime with addUnleashEventListener / removeUnleashEventListener:
+
+```kotlin
+unleash.addUnleashEventListener(myListener)
+```
+
+Which listener to choose (short guide)
+- Use `UnleashReadyListener` when you want a single notification that Unleash has an initial state (e.g., unblock UI once toggles are loaded).
+- Use `UnleashFetcherHeartbeatListener.togglesUpdated` when you want to react to each successful fetch (equivalent to the old polling callback that processed toggles).
+- Use `UnleashStateListener.onStateChanged` when you want a callback tied to cache updates (it fires whenever the in-memory toggle state changes).
+- Use `UnleashImpressionEventListener.onImpression` to receive feature evaluation events.
+
+Cached context and skipping fetches
+- Previously some clients compared cached context properties to avoid unnecessary fetches. In the new SDK the fetcher keeps track of the context used for the last fetch and will skip a fetch if the incoming UnleashContext equals the previously fetched context (see `UnleashFetcher.startWatchingContext()`). That equality check uses the UnleashContext data class equals(), so if your new context has identical values the SDK will skip the refresh automatically.
+- If you still need to perform a manual diff before calling setContext (for app-level reasons), store the previous context in your code and compare manually.
+
+Examples
+- React to updated toggles (heartbeat listener):
+
+```kotlin
+val heartbeat = object : UnleashFetcherHeartbeatListener {
+    override fun togglesUpdated() { /* handle new toggles */ }
+    override fun togglesChecked() { }
+    override fun onError(event: HeartbeatEvent) { /* handle error */ }
+}
+unleash.addUnleashEventListener(heartbeat)
+```
+
+- Wait until SDK ready using UnleashReadyListener:
+
+```kotlin
+val readyListener = object : UnleashReadyListener {
+    override fun onReady() { /* Unleash has initial state */ }
+}
+// Can be passed to start() or added later
+unleash.addUnleashEventListener(readyListener)
+```
