@@ -268,7 +268,7 @@ $dokka.location:io.getunleash.android.polling/UnleashFetcher/close/#/PointingToD
 $dokka.location:io.getunleash.android.polling/UnleashFetcher/getFeaturesReceivedFlow/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.polling/-unleash-fetcher/get-features-received-flow.html
 $dokka.location:io.getunleash.android.polling/UnleashFetcher/getHeartbeatFlow/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.polling/-unleash-fetcher/get-heartbeat-flow.html
 $dokka.location:io.getunleash.android.polling/UnleashFetcher/refreshToggles/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.polling/-unleash-fetcher/refresh-toggles.html
-$dokka.location:io.getunleash.android.polling/UnleashFetcher/refreshTogglesWithContext/#io.getunleash.android.data.UnleashContext/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.polling/-unleash-fetcher/refresh-toggles-with-context.html
+$dokka.location:io.getunleash.android.polling/UnleashFetcher/refreshTogglesIfContextChanged/#io.getunleash.android.data.UnleashContext/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.polling/-unleash-fetcher/refresh-toggles-if-context-changed.html
 $dokka.location:io.getunleash.android.polling/UnleashFetcher/startWatchingContext/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.polling/-unleash-fetcher/start-watching-context.html
 $dokka.location:io.getunleash.android.tasks////PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.tasks/index.html
 $dokka.location:io.getunleash.android.tasks/DataJob///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.tasks/-data-job/index.html
