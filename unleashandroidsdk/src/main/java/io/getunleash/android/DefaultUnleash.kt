@@ -35,6 +35,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
@@ -49,6 +50,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.io.File
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -109,6 +112,7 @@ class DefaultUnleash(
         extraBufferCapacity = 1000,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
+    private val listenerJobs = ConcurrentHashMap<UnleashListener, CopyOnWriteArrayList<Job>>()
 
     init {
         val httpClientBuilder = ClientBuilder(unleashConfig, androidContext)
@@ -310,35 +314,68 @@ class DefaultUnleash(
         unleashContextState.value = context
     }
 
+    private fun registerListenerJob(listener: UnleashListener, job: Job) {
+        var list = listenerJobs[listener]
+        if (list == null) {
+            val newList = CopyOnWriteArrayList<Job>()
+            val prev = listenerJobs.putIfAbsent(listener, newList)
+            list = prev ?: newList
+        }
+        list.add(job)
+    }
+
     override fun addUnleashEventListener(listener: UnleashListener) {
 
-        if (listener is UnleashReadyListener) coroutineScope.launch {
-            readyOnFeaturesReceived()
-            Log.d(TAG, "Notifying UnleashReadyListener")
-            listener.onReady()
-        }
-
-        if (listener is UnleashStateListener) coroutineScope.launch {
-            cache.getUpdatesFlow().collect {
-                listener.onStateChanged()
+        if (listener is UnleashReadyListener) {
+            val job = coroutineScope.launch {
+                readyOnFeaturesReceived()
+                Log.d(TAG, "Notifying UnleashReadyListener")
+                listener.onReady()
             }
+            registerListenerJob(listener, job)
         }
 
-        if (listener is UnleashImpressionEventListener) coroutineScope.launch {
-            impressionEventsFlow.asSharedFlow().collect { event ->
-                listener.onImpression(event)
-            }
-        }
-
-        if (listener is UnleashFetcherHeartbeatListener) coroutineScope.launch {
-            fetcher.getHeartbeatFlow().collect { event ->
-                if (event.status.isFailed()) {
-                    listener.onError(event)
-                } else if (event.status.isNotModified()) {
-                    listener.togglesChecked()
-                } else if (event.status.isSuccess()) {
-                    listener.togglesUpdated()
+        if (listener is UnleashStateListener) {
+            val job = coroutineScope.launch {
+                cache.getUpdatesFlow().collect {
+                    listener.onStateChanged()
                 }
+            }
+            registerListenerJob(listener, job)
+        }
+
+        if (listener is UnleashImpressionEventListener) {
+            val job = coroutineScope.launch {
+                impressionEventsFlow.asSharedFlow().collect { event ->
+                    listener.onImpression(event)
+                }
+            }
+            registerListenerJob(listener, job)
+        }
+
+        if (listener is UnleashFetcherHeartbeatListener) {
+            val job = coroutineScope.launch {
+                fetcher.getHeartbeatFlow().collect { event ->
+                    if (event.status.isFailed()) {
+                        listener.onError(event)
+                    } else if (event.status.isNotModified()) {
+                        listener.togglesChecked()
+                    } else if (event.status.isSuccess()) {
+                        listener.togglesUpdated()
+                    }
+                }
+            }
+            registerListenerJob(listener, job)
+        }
+    }
+
+    override fun removeUnleashEventListener(listener: UnleashListener) {
+        val jobs = listenerJobs.remove(listener)
+        jobs?.forEach { job ->
+            try {
+                job.cancel()
+            } catch (_: Exception) {
+                // best-effort: ignore cancellation errors
             }
         }
     }
@@ -355,6 +392,9 @@ class DefaultUnleash(
 
     override fun close() {
         networkStatusHelper.close()
+        // cancel any remaining listener jobs (best-effort)
+        listenerJobs.values.forEach { list -> list.forEach { it.cancel() } }
+        listenerJobs.clear()
         job.cancel("Unleash received closed signal")
     }
 }
