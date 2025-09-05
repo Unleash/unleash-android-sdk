@@ -5,7 +5,6 @@ import io.getunleash.android.UnleashConfig
 import io.getunleash.android.data.Parser.proxyResponseAdapter
 import io.getunleash.android.data.UnleashContext
 import io.getunleash.android.data.UnleashState
-import io.getunleash.android.errors.NoBodyException
 import io.getunleash.android.errors.NotAuthorizedException
 import io.getunleash.android.errors.ServerException
 import io.getunleash.android.events.HeartbeatEvent
@@ -81,13 +80,8 @@ open class UnleashFetcher(
     fun startWatchingContext() {
         unleashScope.launch {
             unleashContext.collect {
-                if (it == contextForLastFetch) {
-                    Log.d(TAG, "Context unchanged, skipping refresh toggles")
-                    return@collect
-                }
                 withContext(coroutineContextForContextChange) {
-                    Log.d(TAG, "Unleash context changed: $it")
-                    refreshToggles()
+                    refreshTogglesIfContextChanged(it)
                 }
             }
         }
@@ -97,7 +91,16 @@ open class UnleashFetcher(
         return this.refreshTogglesWithContext(unleashContext.value);
     }
 
-    suspend fun refreshTogglesWithContext(ctx: UnleashContext): ToggleResponse {
+    suspend fun refreshTogglesIfContextChanged(ctx: UnleashContext): ToggleResponse {
+        if (ctx == contextForLastFetch) {
+            Log.d(TAG, "Context unchanged, skipping refresh toggles")
+            return ToggleResponse(Status.NOT_MODIFIED)
+        }
+        Log.d(TAG, "Unleash context changed: $ctx")
+        return refreshTogglesWithContext(ctx)
+    }
+
+    private suspend fun refreshTogglesWithContext(ctx: UnleashContext): ToggleResponse {
         if (throttler.performAction()) {
             Log.d(TAG, "Refreshing toggles")
             val response = doFetchToggles(ctx)
@@ -174,7 +177,7 @@ open class UnleashFetcher(
                 return when {
                     res.isSuccessful -> {
                         etag = res.header("ETag")
-                        res.body?.use { b ->
+                        res.body.use { b ->
                             try {
                                 val proxyResponse: ProxyResponse =
                                         proxyResponseAdapter.fromJson(b.string())!!
@@ -184,7 +187,6 @@ open class UnleashFetcher(
                                 FetchResponse(Status.FAILED, error = e)
                             }
                         }
-                                ?: FetchResponse(Status.FAILED, error = NoBodyException())
                     }
                     res.code == 304 -> {
                         FetchResponse(Status.NOT_MODIFIED)
@@ -222,7 +224,7 @@ open class UnleashFetcher(
             continuation.invokeOnCancellation {
                 try {
                     cancel()
-                } catch (ex: Throwable) {
+                } catch (_: Throwable) {
                     // Ignore cancel exception
                 }
             }

@@ -85,6 +85,9 @@ val initialContext = UnleashContext.newBuilder()
 unleash.setContext(initialContext)
 ```
 
+You can pass event listeners either when constructing DefaultUnleash or when calling start(). By default the SDK uses delayed initialization (delayedInitialization = true). When delayed initialization is enabled, any listeners you pass to the constructor are stored and only registered when you call start(). This avoids emitting events before the SDK has finished its startup sequence. If you prefer to register and activate listeners immediately, set delayedInitialization to false in the UnleashConfig and the SDK will register constructor-provided listeners at construction time and start immediately.
+
+
 ### Step 4: Start unleash
 From the moment you call `unleash.start()`, it will immediately poll for the latest feature toggles and then continue polling in the background. 
 
@@ -225,6 +228,18 @@ In [the sample app](app/src/main/java/io/getunleash/unleashandroid/TestApplicati
 
 ## Default behavior
 If you don't provide an initial state, Unleash will use the default behavior for feature toggles with unknown state. This means that if a feature toggle is not found in the list of toggles, it will be disabled by default.
+
+## Context management
+
+The SDK uses UnleashContext as a Kotlin data class, so contexts are compared by value (all fields are compared). There are now two different fetch paths and it's important to understand which one applies in each situation:
+
+- Scheduled polling and manual "fetch" API: `refreshTogglesWithContext` (internal fetch path) always attempts to fetch from upstream (subject to throttling and HTTP 304 handling). This is the path used by the scheduler so periodic polls will always check upstream for changes even when the context hasn't changed.
+- Context-change-triggered fetch: `refreshTogglesIfContextChanged` is used when the SDK is asked to update the context (`setContext` / `setContextWithTimeout`). That helper compares the new context to the last fetched context and will skip the network call if the values are identical.
+
+**Important details**:
+- `setContext` — when called after the SDK has started, the SDK will attempt a context-change-triggered fetch via `refreshTogglesIfContextChanged`. That helper will NOT perform a network request if the new context equals the last fetched context (prevents accidental redundant fetches when you update context with same values).
+- `setContextAsync` — updates the internal context asynchronously without forcing an immediate fetch. The scheduled polling path still runs independently and will call `refreshTogglesWithContext` periodically to check upstream for changes.
+- `refreshTogglesNow` / `refreshTogglesNowAsync` — these public methods force a fetch by calling `refreshToggles` and bypass the context equality check. They still respect throttling, so excessive forced fetches may be skipped due to throttling.
 
 ## Releasing
 
