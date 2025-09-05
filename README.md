@@ -158,19 +158,69 @@ After starting the Unleash instance, you can start using the feature toggles.
 
 ```kotlin
 if (unleash.isEnabled("flag-1")) {
-    // do something
+    println("flag-1 enabled")
 } else {
-    // do something else
+    println("flag-1 disabled")
 }
 
 unleash.getVariant("flag-with-variant").let { variant ->
-    if (variant.enabled) {
-        // do something
+    if (variant.featureEnabled) {
+        println("variant enabled: ${variant.name}") // you can also access variant.payload
     } else {
-        // do something else
+        println("variant disabled")
     }
 }
 ```
+
+
+### Event listeners examples
+
+**Note:** to migrate from the old SDK, see [the migration guide](docs/MigrationGuide.md#event-listeners--migrating-from-old-pollingmodes-callbacks-to-fine-grained-listeners).
+
+This SDK exposes small focused listener interfaces. Below are short copy-paste examples showing how to register them. 
+
+- Register a heartbeat listener (fires on successful fetch, 304 and errors):
+```kotlin
+val heartbeatListener = object : UnleashFetcherHeartbeatListener {
+    override fun togglesUpdated() {
+        // called when new toggles were fetched successfully
+    }
+    override fun togglesChecked() {
+        // called when server returns 304 Not Modified
+    }
+    override fun onError(event: HeartbeatEvent) {
+        // called when an error occurred while fetching
+    }
+}
+
+// add at start or at runtime
+unleash.start(eventListeners = listOf(heartbeatListener))
+// or
+unleash.addUnleashEventListener(heartbeatListener)
+```
+
+- Register a state listener (fires when in-memory state/cache changes):
+```kotlin
+val stateListener = object : UnleashStateListener {
+    override fun onStateChanged() {
+        // called when the toggle cache was updated
+    }
+}
+unleash.addUnleashEventListener(stateListener)
+```
+
+- Ready listener (fires once when initial state arrives):
+```kotlin
+val readyListener = object : UnleashReadyListener {
+    override fun onReady() {
+        // initial state received — safe to proceed
+    }
+}
+unleash.addUnleashEventListener(readyListener)
+```
+
+You can add or remove listeners at runtime with `addUnleashEventListener`/`removeUnleashEventListener`.
+
 
 #### Example main activity
 In [the sample app](app/src/main/java/io/getunleash/unleashandroid/TestApplication.kt) we use this to display the state of a toggle on the [main activity](app/src/main/java/io/getunleash/unleashandroid/MainActivity.kt). We also configured a few event listeners to display how to use them.

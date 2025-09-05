@@ -728,7 +728,7 @@ class DefaultUnleashTest : BaseTest() {
         assertThat(writeCountingBackup.writeCalls).isEqualTo(1)
     }
 
-    @Test
+	@Test
     fun `constructor listeners are registered on start when delayed initialization is enabled`() {
         val staticBootstrap = listOf(
             Toggle(name = "with-impression", enabled = true, impressionData = true),
@@ -776,5 +776,91 @@ class DefaultUnleashTest : BaseTest() {
         await().atMost(1, TimeUnit.SECONDS).until { impressionEvents.isNotEmpty() }
         assertThat(impressionEvents).hasSize(1)
         assertThat(impressionEvents[0].featureName).isEqualTo("with-impression")
+    }
+
+    @Test
+    fun `removing ready listener before start should not notify it`() {
+        val unleash = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = UnleashConfig.newBuilder("test-android-app")
+                .pollingStrategy.enabled(false)
+                .metricsStrategy.enabled(false)
+                .localStorageConfig.enabled(false)
+                .build(),
+            lifecycle = mock(Lifecycle::class.java),
+        )
+
+        var onReadyCalled = false
+        val readyListener = object : UnleashReadyListener {
+            override fun onReady() {
+                onReadyCalled = true
+            }
+        }
+
+        // add then remove before calling start
+        unleash.addUnleashEventListener(readyListener)
+        unleash.removeUnleashEventListener(readyListener)
+
+        unleash.start(bootstrap = staticToggleList)
+
+        // ensure ready would be achieved but our removed listener shouldn't be called
+        await().atMost(1, TimeUnit.SECONDS).until { unleash.isReady() }
+        Assert.assertFalse(onReadyCalled)
+    }
+
+    @Test
+    fun `removing impression listener should stop further impressions`() {
+        val unleash = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = UnleashConfig.newBuilder("test-android-app")
+                .pollingStrategy.enabled(false)
+                .metricsStrategy.enabled(false)
+                .localStorageConfig.enabled(false)
+                .forceImpressionData(true)
+                .build(),
+            unleashContext = UnleashContext(userId = "123"),
+            lifecycle = mock(Lifecycle::class.java)
+        )
+
+        unleash.start(
+            bootstrap = listOf(
+                Toggle(name = "imp-1", enabled = true, impressionData = true),
+                Toggle(name = "imp-2", enabled = true, impressionData = true)
+            )
+        )
+
+        await().atMost(1, TimeUnit.SECONDS).until { unleash.isReady() }
+
+        val events = mutableListOf<ImpressionEvent>()
+        val impressionListener = object : UnleashImpressionEventListener {
+            override fun onImpression(event: ImpressionEvent) {
+                events.add(event)
+            }
+        }
+
+        unleash.addUnleashEventListener(impressionListener)
+
+        // produce some impressions
+        unleash.isEnabled("imp-1")
+        unleash.isEnabled("imp-2")
+        unleash.isEnabled("non-existing")
+
+        await().atMost(1, TimeUnit.SECONDS).until { events.size >= 3 }
+
+        // remove listener
+        unleash.removeUnleashEventListener(impressionListener)
+
+        // produce more impressions which should NOT be delivered
+        unleash.isEnabled("imp-1")
+        unleash.isEnabled("imp-2")
+
+        // give a short allowance for any in-flight emissions
+        Thread.sleep(200)
+
+        // events should remain the same
+        assertThat(events).hasSize(3)
+        assertThat(events)
+            .extracting("featureName")
+            .containsExactlyInAnyOrder("imp-1", "imp-2", "non-existing")
     }
 }
