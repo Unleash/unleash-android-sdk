@@ -116,6 +116,7 @@ unleash.start()
 #### Updating class references
 Most of the classes have been moved to `io.getunleash.android` package. Update the import statements in your classes.
 
+
 ### Event listeners — migrating from old PollingModes callbacks to fine-grained listeners
 
 In the old SDK it was common to register a callback directly on the polling mode, for example:
@@ -192,3 +193,23 @@ val readyListener = object : UnleashReadyListener {
 // Can be passed to start() or added later
 unleash.addUnleashEventListener(readyListener)
 ```
+
+### Environment handling (deprecation of .environment())
+
+In the old SDK it was possible to set an explicit environment on the config, for example:
+
+**Old SDK**
+```kotlin
+UnleashConfig.newBuilder()
+    .environment("dev")
+    .clientKey(env.getUnleashKey())
+    // ...
+    .build()
+```
+
+The new SDK no longer exposes an explicit `.environment(...)` option on UnleashConfig. The environment is derived from the API key you provide. This was intentionally removed to avoid duplication and ambiguity — the client key already encodes which environment it belongs to, so having the same value in two places caused confusion.
+
+What this means for you:
+- If you previously set `.environment(env.slug)` in addition to `.clientKey(...)`, you can remove the explicit `.environment(...)` call when migrating. The client key is sufficient.
+- The SDK will behave according to the environment tied to the provided client key.
+
