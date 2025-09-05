@@ -727,4 +727,54 @@ class DefaultUnleashTest : BaseTest() {
         // validate the backup file was not overridden by the old data
         assertThat(writeCountingBackup.writeCalls).isEqualTo(1)
     }
+
+    @Test
+    fun `constructor listeners are registered on start when delayed initialization is enabled`() {
+        val staticBootstrap = listOf(
+            Toggle(name = "with-impression", enabled = true, impressionData = true),
+            Toggle(name = "no-impression", enabled = true, impressionData = false)
+        )
+
+        var ready = false
+        var stateChanged = false
+        val impressionEvents = mutableListOf<ImpressionEvent>()
+
+        val listener = object : UnleashReadyListener, UnleashImpressionEventListener, UnleashStateListener {
+            override fun onReady() {
+                ready = true
+            }
+
+            override fun onImpression(event: ImpressionEvent) {
+                impressionEvents.add(event)
+            }
+
+            override fun onStateChanged() {
+                stateChanged = true
+            }
+        }
+
+        val unleash = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = UnleashConfig.newBuilder("test-android-app")
+                .pollingStrategy.enabled(false)
+                .metricsStrategy.enabled(false)
+                .localStorageConfig.enabled(false)
+                // delayedInitialization is true by default; we rely on that behaviour
+                .build(),
+            lifecycle = mock(Lifecycle::class.java),
+            eventListeners = listOf(listener)
+        )
+
+        // Start with bootstrap toggles which should trigger a state update and then ready
+        unleash.start(bootstrap = staticBootstrap)
+
+        await().atMost(2, TimeUnit.SECONDS).until { ready && stateChanged }
+
+        // Trigger an impression event by evaluating a toggle configured to emit impressions
+        unleash.isEnabled("with-impression")
+
+        await().atMost(1, TimeUnit.SECONDS).until { impressionEvents.isNotEmpty() }
+        assertThat(impressionEvents).hasSize(1)
+        assertThat(impressionEvents[0].featureName).isEqualTo("with-impression")
+    }
 }

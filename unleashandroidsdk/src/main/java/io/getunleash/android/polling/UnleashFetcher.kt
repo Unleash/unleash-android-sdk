@@ -80,13 +80,8 @@ open class UnleashFetcher(
     fun startWatchingContext() {
         unleashScope.launch {
             unleashContext.collect {
-                if (it == contextForLastFetch) {
-                    Log.d(TAG, "Context unchanged, skipping refresh toggles")
-                    return@collect
-                }
                 withContext(coroutineContextForContextChange) {
-                    Log.d(TAG, "Unleash context changed: $it")
-                    refreshToggles()
+                    refreshTogglesIfContextChanged(it)
                 }
             }
         }
@@ -101,10 +96,11 @@ open class UnleashFetcher(
             Log.d(TAG, "Context unchanged, skipping refresh toggles")
             return ToggleResponse(Status.NOT_MODIFIED)
         }
+        Log.d(TAG, "Unleash context changed: $ctx")
         return refreshTogglesWithContext(ctx)
     }
 
-    suspend fun refreshTogglesWithContext(ctx: UnleashContext): ToggleResponse {
+    private suspend fun refreshTogglesWithContext(ctx: UnleashContext): ToggleResponse {
         if (throttler.performAction()) {
             Log.d(TAG, "Refreshing toggles")
             val response = doFetchToggles(ctx)

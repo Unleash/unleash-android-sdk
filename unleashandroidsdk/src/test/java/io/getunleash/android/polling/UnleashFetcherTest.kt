@@ -96,7 +96,7 @@ class UnleashFetcherTest : BaseTest() {
     }
 
     @Test
-    fun `refreshNow with force should bypass context equality and perform fetch`() {
+    fun `refreshNow should bypass context equality and perform fetch`() {
         // Given
         val server = MockWebServer()
         server.enqueue(
@@ -132,7 +132,7 @@ class UnleashFetcherTest : BaseTest() {
 
         runBlocking {
             // non-forced refresh should detect unchanged context and skip (no network call)
-            val resp = unleashFetcher.refreshToggles()
+            val resp = unleashFetcher.refreshTogglesIfContextChanged(UnleashContext(userId = "123"))
             assertThat(resp.status.isNotModified()).isTrue()
         }
 
@@ -174,8 +174,7 @@ class UnleashFetcherTest : BaseTest() {
         )
 
         runBlocking {
-            // simulate initial fetch via explicit context-based fetch path
-            val initial = unleashFetcher.refreshTogglesWithContext(UnleashContext(userId = "123"))
+            val initial = unleashFetcher.refreshToggles()
             assertThat(initial.status.isSuccess()).isTrue()
         }
 
@@ -184,21 +183,13 @@ class UnleashFetcherTest : BaseTest() {
         assertThat(firstRequest!!.path).isEqualTo("/unleash?appName=test-app&userId=123")
 
         runBlocking {
-            // scheduled polling (non-forced) should skip because context unchanged
-            val skipped = unleashFetcher.refreshToggles()
-            assertThat(skipped.status.isNotModified()).isTrue()
+            // when context is unchanged, a fetch from scheduled polling or setContext should be skipped
+            // this is used internally by the polling mechanism and setContext calls
+            val skipped = unleashFetcher.refreshTogglesIfContextChanged(UnleashContext(userId = "123"))
+            assertThat(skipped.status).isEqualTo(Status.NOT_MODIFIED)
         }
 
         val noReq = server.takeRequest(200, TimeUnit.MILLISECONDS)
         assertThat(noReq).isNull()
-
-        // simulate setContext behavior: calling refreshTogglesWithContext with same ctx should skip
-        runBlocking {
-            val skipped2 = unleashFetcher.refreshTogglesWithContext(UnleashContext(userId = "123"))
-            assertThat(skipped2.status.isNotModified()).isTrue()
-        }
-
-        val stillNoReq = server.takeRequest(200, TimeUnit.MILLISECONDS)
-        assertThat(stillNoReq).isNull()
     }
 }

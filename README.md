@@ -85,6 +85,9 @@ val initialContext = UnleashContext.newBuilder()
 unleash.setContext(initialContext)
 ```
 
+You can pass event listeners either when constructing DefaultUnleash or when calling start(). By default the SDK uses delayed initialization (delayedInitialization = true). When delayed initialization is enabled, any listeners you pass to the constructor are stored and only registered when you call start(). This avoids emitting events before the SDK has finished its startup sequence. If you prefer to register and activate listeners immediately, set delayedInitialization to false in the UnleashConfig and the SDK will register constructor-provided listeners at construction time and start immediately.
+
+
 ### Step 4: Start unleash
 From the moment you call `unleash.start()`, it will immediately poll for the latest feature toggles and then continue polling in the background. 
 

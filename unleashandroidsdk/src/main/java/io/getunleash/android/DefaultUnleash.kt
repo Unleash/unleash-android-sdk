@@ -73,6 +73,8 @@ class DefaultUnleash(
         internal const val BACKUP_DIR_NAME = "unleash_backup"
     }
 
+    private val initialListeners: MutableList<UnleashListener> = mutableListOf()
+
     // allow tests in the same module to inject a custom LocalBackup for deterministic behavior
     private var localBackupFactory: (File) -> LocalBackup = { dir -> LocalBackup(dir) }
 
@@ -129,10 +131,13 @@ class DefaultUnleash(
             networkAvailable = networkStatusHelper.isAvailable(),
             scope = coroutineScope
         )
+
         if (!unleashConfig.delayedInitialization) {
             start(eventListeners)
-        } else if (eventListeners.isNotEmpty()) {
-            throw IllegalArgumentException("Event listeners are not supported as constructor arguments with delayed initialization")
+        } else {
+            if (eventListeners.isNotEmpty()) {
+                initialListeners.addAll(eventListeners)
+            }
         }
     }
 
@@ -145,6 +150,8 @@ class DefaultUnleash(
             Log.w(TAG, "Unleash already started, ignoring start call")
             return
         }
+        initialListeners.forEach { addUnleashEventListener(it) }
+        initialListeners.clear()
         eventListeners.forEach { addUnleashEventListener(it) }
         networkStatusHelper.registerNetworkListener(taskManager)
         if (unleashConfig.localStorageConfig.enabled) {
