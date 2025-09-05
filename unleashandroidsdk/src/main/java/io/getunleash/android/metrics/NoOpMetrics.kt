@@ -11,6 +11,6 @@ class NoOpMetrics: MetricsHandler {
         return variant
     }
 
-    override suspend fun sendMetrics() {
+    override suspend fun sendMetrics(onComplete: ((Result<Unit>) -> Unit)?) {
     }
 }
