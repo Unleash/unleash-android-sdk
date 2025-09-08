@@ -18,8 +18,8 @@ data class Bucket(
 )
 
 interface UnleashMetricsBucket {
-    fun count(featureName: String, enabled: Boolean): Boolean
-    fun countVariant(featureName: String, variant: Variant): Variant
+    fun count(featureName: String, enabled: Boolean, increment: Int = 1): Boolean
+    fun countVariant(featureName: String, variant: Variant, increment: Int = 1): Variant
     fun isEmpty(): Boolean
 }
 
@@ -30,14 +30,14 @@ data class CountBucket(
     val variants: ConcurrentHashMap<Pair<String, String>, AtomicInteger> = ConcurrentHashMap()
 ): UnleashMetricsBucket {
 
-    override fun count(featureName: String, enabled: Boolean): Boolean {
+    override fun count(featureName: String, enabled: Boolean, increment: Int): Boolean {
         (if (enabled) yes else no)
-            .getOrPut(featureName) { AtomicInteger(0) }.incrementAndGet()
+            .getOrPut(featureName) { AtomicInteger(0) }.addAndGet(increment)
         return enabled
     }
 
-    override fun countVariant(featureName: String, variant: Variant): Variant {
-        variants.getOrPut(Pair(featureName, variant.name)) { AtomicInteger(0) }.incrementAndGet()
+    override fun countVariant(featureName: String, variant: Variant, increment: Int): Variant {
+        variants.getOrPut(Pair(featureName, variant.name)) { AtomicInteger(0) }.addAndGet(increment)
         return variant
     }
 

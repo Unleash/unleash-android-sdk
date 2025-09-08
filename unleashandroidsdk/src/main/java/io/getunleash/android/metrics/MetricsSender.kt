@@ -16,6 +16,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import java.io.IOException
 import java.util.Date
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.TimeUnit
 
 class MetricsSender(
@@ -30,6 +31,7 @@ class MetricsSender(
     private val metricsUrl = config.proxyUrl?.toHttpUrl()?.newBuilder()?.addPathSegment("client")
         ?.addPathSegment("metrics")?.build()
     private var bucket: CountBucket = CountBucket(start = Date())
+    private val inFlight = AtomicBoolean(false)
     private val throttler =
         Throttler(
             TimeUnit.MILLISECONDS.toSeconds(config.metricsStrategy.interval),
@@ -37,7 +39,7 @@ class MetricsSender(
             metricsUrl.toString()
         )
 
-    override suspend fun sendMetrics() {
+    override suspend fun sendMetrics(onComplete: ((Result<Unit>) -> Unit)?) {
         if (metricsUrl == null) {
             Log.d(TAG, "No proxy URL configured, skipping metrics reporting")
             return
@@ -46,12 +48,16 @@ class MetricsSender(
             Log.d(TAG, "No metrics to report")
             return
         }
+        if (!inFlight.compareAndSet(false, true)) {
+            Log.d(TAG, "Metrics report already in-flight, skipping this send")
+            return
+        }
         if (throttler.performAction()) {
             val toReport = swapAndFreeze()
             val payload = MetricsPayload(
                 appName = config.appName,
                 instanceId = config.instanceId,
-                bucket = toReport
+                bucket = toReport.first
             )
             val request = Request.Builder()
                 .headers(applicationHeaders.toHeaders())
@@ -61,6 +67,13 @@ class MetricsSender(
                 ).build()
             httpClient.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
+                    mergeBack(toReport.second)
+                    inFlight.set(false)
+                    try {
+                        onComplete?.invoke(Result.failure(e))
+                    } catch (t: Throwable) {
+                        Log.w(TAG, "onComplete callback threw", t)
+                    }
                     Log.i(TAG, "Failed to report metrics for interval", e)
                 }
 
@@ -72,17 +85,37 @@ class MetricsSender(
                     throttler.handle(response.code)
                     response.body.use { // Need to consume body to ensure we don't keep connection open
                     }
+                    inFlight.set(false)
+                    try {
+                        onComplete?.invoke(Result.success(Unit))
+                    } catch (t: Throwable) {
+                        Log.w(TAG, "onComplete callback threw", t)
+                    }
                 }
             })
         } else {
             throttler.skipped()
+            inFlight.set(false)
         }
     }
 
-    private fun swapAndFreeze(): Bucket {
-        val bucketRef = bucket
+    private fun swapAndFreeze(): Pair<Bucket, CountBucket> {
+        val snapshot = bucket.copy()
         bucket = CountBucket(start = Date())
-        return bucketRef.copy().toBucket(bucket.start)
+        return Pair(snapshot.toBucket(bucket.start), snapshot)
+    }
+
+    // Note: this does not maintain the initial start time of the snapshot
+    private fun mergeBack(snapshot: CountBucket) {
+        for ((feature, count) in snapshot.yes) {
+            bucket.count(feature, true, count.get())
+        }
+        for ((feature, count) in snapshot.no) {
+            bucket.count(feature, false, count.get())
+        }
+        for ((pair, count) in snapshot.variants) {
+            bucket.countVariant(pair.first, Variant(pair.second), count.get())
+        }
     }
 
     override fun count(featureName: String, enabled: Boolean): Boolean {
