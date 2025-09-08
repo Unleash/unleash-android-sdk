@@ -181,11 +181,8 @@ $dokka.location:io.getunleash.android.http/NetworkStatusHelper/registerNetworkLi
 $dokka.location:io.getunleash.android.http/Throttler.Companion///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/-companion/index.html
 $dokka.location:io.getunleash.android.http/Throttler///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/index.html
 $dokka.location:io.getunleash.android.http/Throttler/Throttler/#kotlin.Long#kotlin.Long#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/-throttler.html
-$dokka.location:io.getunleash.android.http/Throttler/getFailures/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/get-failures.html
-$dokka.location:io.getunleash.android.http/Throttler/getSkips/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/get-skips.html
 $dokka.location:io.getunleash.android.http/Throttler/handle/#kotlin.Int/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/handle.html
-$dokka.location:io.getunleash.android.http/Throttler/performAction/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/perform-action.html
-$dokka.location:io.getunleash.android.http/Throttler/skipped/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/skipped.html
+$dokka.location:io.getunleash.android.http/Throttler/runIfAllowed/#kotlin.coroutines.SuspendFunction0[TypeParam(bounds=[kotlin.Any?])]/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.http/-throttler/run-if-allowed.html
 $dokka.location:io.getunleash.android.metrics////PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/index.html
 $dokka.location:io.getunleash.android.metrics/Bucket///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-bucket/index.html
 $dokka.location:io.getunleash.android.metrics/Bucket/Bucket/#java.util.Date#java.util.Date#kotlin.collections.MutableMap[kotlin.String,io.getunleash.android.metrics.EvaluationCount]/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-bucket/-bucket.html
