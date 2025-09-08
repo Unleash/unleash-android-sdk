@@ -54,12 +54,20 @@ class Throttler(
         failures.incrementAndGet()
     }
 
-    fun performAction(): Boolean {
-        return skips.get() <= 0
-    }
-
-    fun skipped() {
-        skips.decrementAndGet()
+    /**
+     * Suspend-friendly helper that runs [block] only if the throttler allows an action right now.
+     * If the throttler disallows the action this interval, the skip counter will be decremented
+     * (counting down the remaining backoff intervals) and null will be returned.
+     *
+     * Returns the block's result when executed, or null when skipped.
+     */
+    suspend fun <T> runIfAllowed(block: suspend () -> T): T? {
+        return if (skips.get() <= 0) {
+            block()
+        } else {
+            skips.decrementAndGet()
+            null
+        }
     }
 
     internal fun handleHttpErrorCodes(responseCode: Int) {
@@ -89,11 +97,11 @@ class Throttler(
         }
     }
 
-    fun getSkips(): Long {
+    internal fun getSkips(): Long {
         return skips.get()
     }
 
-    fun getFailures(): Long {
+    internal fun getFailures(): Long {
         return failures.get()
     }
 

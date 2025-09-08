@@ -52,7 +52,7 @@ class MetricsSender(
             Log.d(TAG, "Metrics report already in-flight, skipping this send")
             return
         }
-        if (throttler.performAction()) {
+        throttler.runIfAllowed {
             val toReport = swapAndFreeze()
             val payload = MetricsPayload(
                 appName = config.appName,
@@ -93,8 +93,7 @@ class MetricsSender(
                     }
                 }
             })
-        } else {
-            throttler.skipped()
+        } ?: run {
             inFlight.set(false)
         }
     }
