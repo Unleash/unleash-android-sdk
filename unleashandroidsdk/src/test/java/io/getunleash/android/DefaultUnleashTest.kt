@@ -403,9 +403,13 @@ class DefaultUnleashTest : BaseTest() {
 
         // change context to force a refresh
         unleash.setContext(UnleashContext(userId = "2"))
-        assertThat(togglesChecked).isEqualTo(1)
+        await().atMost(1, TimeUnit.SECONDS).until {
+            togglesChecked == 1
+        }
         unleash.setContext(UnleashContext(userId = "3"))
-        assertThat(togglesChecked).isEqualTo(2)
+        await().atMost(1, TimeUnit.SECONDS).until {
+            togglesChecked == 2
+        }
     }
 
     @Test

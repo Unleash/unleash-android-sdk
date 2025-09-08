@@ -111,7 +111,7 @@ class MetricsSenderTest : BaseTest() {
         var calls = 0
         // Make the server drop the connection to simulate a network failure (500, 429, etc. would throttle further requests)
         server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.DISCONNECT_AT_START))
-        metricsSender.sendMetrics { latch.countDown(); calls++ }
+        metricsSender.sendMetrics { calls++; latch.countDown() }
         metricsSender.count("featureA", true) // in between the failed send and the retry, add another metric
         metricsSender.sendMetrics { calls++ } // This should be skipped since a send is in-flight
         metricsSender.sendMetrics { calls++ } // This should be skipped since a send is in-flight
