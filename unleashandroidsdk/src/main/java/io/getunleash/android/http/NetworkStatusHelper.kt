@@ -6,7 +6,7 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
-import android.util.Log
+import io.getunleash.android.util.LoggerWrapper
 
 interface NetworkListener {
     fun onAvailable()
@@ -77,7 +77,7 @@ class NetworkStatusHelper(private val context: Context) {
     private fun getConnectivityManager(): ConnectivityManager? {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE)
         if (connectivityManager !is ConnectivityManager) {
-            Log.w(TAG, "Failed to get ConnectivityManager assuming network is available")
+            LoggerWrapper.w(TAG, "Failed to get ConnectivityManager assuming network is available")
             return null
         }
         return connectivityManager

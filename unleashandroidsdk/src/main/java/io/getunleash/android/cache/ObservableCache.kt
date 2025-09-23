@@ -1,9 +1,9 @@
 package io.getunleash.android.cache
 
-import android.util.Log
 import io.getunleash.android.data.Toggle
 import io.getunleash.android.data.UnleashState
 import io.getunleash.android.unleashScope
+import io.getunleash.android.util.LoggerWrapper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -32,19 +32,19 @@ class ObservableCache(private val cache: ToggleCache, private val coroutineScope
 
     override fun write(state: UnleashState) {
         cache.write(state)
-        Log.d(TAG, "Done writing cache with ${newStateEventFlow.subscriptionCount.value} subscribers")
+        LoggerWrapper.d(TAG, "Done writing cache with ${newStateEventFlow.subscriptionCount.value} subscribers")
         coroutineScope.launch {
-            Log.d(TAG, "Emitting new state with ${state.toggles.size} toggles")
+            LoggerWrapper.d(TAG, "Emitting new state with ${state.toggles.size} toggles")
             newStateEventFlow.emit(state)
         }
     }
 
     override fun subscribeTo(featuresReceived: Flow<UnleashState>) {
-        Log.d(TAG, "Subscribing to observable cache")
+        LoggerWrapper.d(TAG, "Subscribing to observable cache")
         coroutineScope.launch {
             featuresReceived.collect { state ->
                 withContext(Dispatchers.IO) {
-                    Log.d(TAG, "Storing new state with ${state.toggles.size} toggles for $state.context")
+                    LoggerWrapper.d(TAG, "Storing new state with ${state.toggles.size} toggles for $state.context")
                     write(state)
                 }
             }

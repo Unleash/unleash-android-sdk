@@ -4,10 +4,20 @@ import io.getunleash.android.data.Toggle
 import io.getunleash.android.data.UnleashContext
 import io.getunleash.android.data.Variant
 import io.getunleash.android.events.UnleashListener
+import io.getunleash.android.util.LogLevel
+import io.getunleash.android.util.LoggerWrapper
 import java.io.Closeable
 import java.io.File
 
 val disabledVariant = Variant("disabled")
+
+var logLevel: LogLevel
+    get() {
+        return LoggerWrapper.logLevel
+    }
+    set(value) {
+        LoggerWrapper.logLevel = value
+    }
 
 interface Unleash: Closeable {
     /**
