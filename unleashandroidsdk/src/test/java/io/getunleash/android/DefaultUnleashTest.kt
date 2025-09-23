@@ -131,7 +131,6 @@ class DefaultUnleashTest : BaseTest() {
             cacheImpl = InspectableCache(staticToggleList.associateBy { it.name }),
             lifecycle = mock(Lifecycle::class.java),
         )
-
         unleash.start()
         unleash.start()
 
