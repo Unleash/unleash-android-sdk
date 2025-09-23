@@ -1,9 +1,11 @@
 package io.getunleash.android
 
+import io.getunleash.android.data.Toggle
 import io.getunleash.android.data.UnleashContext
 import io.getunleash.android.data.Variant
 import io.getunleash.android.events.UnleashListener
 import java.io.Closeable
+import java.io.File
 
 val disabledVariant = Variant("disabled")
 
@@ -70,4 +72,13 @@ interface Unleash: Closeable {
      * once the initial fetch of toggles has been completed or failed.
      */
     fun isReady(): Boolean
+
+    /**
+     * Starts Unleash manually
+     */
+    fun start(
+        eventListeners: List<UnleashListener> = emptyList(),
+        bootstrapFile: File? = null,
+        bootstrap: List<Toggle> = emptyList()
+    )
 }
