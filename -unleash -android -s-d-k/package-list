@@ -280,6 +280,25 @@ $dokka.location:io.getunleash.android.tasks/LifecycleAwareTaskManager/onAvailabl
 $dokka.location:io.getunleash.android.tasks/LifecycleAwareTaskManager/onLost/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.tasks/-lifecycle-aware-task-manager/on-lost.html
 $dokka.location:io.getunleash.android.tasks/LifecycleAwareTaskManager/onStateChanged/#androidx.lifecycle.LifecycleOwner#androidx.lifecycle.Lifecycle.Event/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.tasks/-lifecycle-aware-task-manager/on-state-changed.html
 $dokka.location:io.getunleash.android.tasks/LifecycleAwareTaskManager/stop/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.tasks/-lifecycle-aware-task-manager/stop.html
+$dokka.location:io.getunleash.android.util////PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/index.html
+$dokka.location:io.getunleash.android.util/LogLevel.DEBUG///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}-unleash -android -s-d-k/io.getunleash.android.util/-log-level/-d-e-b-u-g/index.html
+$dokka.location:io.getunleash.android.util/LogLevel.ERROR///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}-unleash -android -s-d-k/io.getunleash.android.util/-log-level/-e-r-r-o-r/index.html
+$dokka.location:io.getunleash.android.util/LogLevel.INFO///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}-unleash -android -s-d-k/io.getunleash.android.util/-log-level/-i-n-f-o/index.html
+$dokka.location:io.getunleash.android.util/LogLevel.NONE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}-unleash -android -s-d-k/io.getunleash.android.util/-log-level/-n-o-n-e/index.html
+$dokka.location:io.getunleash.android.util/LogLevel.VERBOSE///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}-unleash -android -s-d-k/io.getunleash.android.util/-log-level/-v-e-r-b-o-s-e/index.html
+$dokka.location:io.getunleash.android.util/LogLevel.WARN///PointingToDeclaration/{"org.jetbrains.dokka.links.EnumEntryDRIExtra":{"key":"org.jetbrains.dokka.links.EnumEntryDRIExtra"}}-unleash -android -s-d-k/io.getunleash.android.util/-log-level/-w-a-r-n/index.html
+$dokka.location:io.getunleash.android.util/LogLevel///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-log-level/index.html
+$dokka.location:io.getunleash.android.util/LogLevel/entries/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-log-level/entries.html
+$dokka.location:io.getunleash.android.util/LogLevel/priority/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-log-level/priority.html
+$dokka.location:io.getunleash.android.util/LogLevel/valueOf/#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-log-level/value-of.html
+$dokka.location:io.getunleash.android.util/LogLevel/values/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-log-level/values.html
+$dokka.location:io.getunleash.android.util/UnleashLogger///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-unleash-logger/index.html
+$dokka.location:io.getunleash.android.util/UnleashLogger/d/#kotlin.String?#kotlin.String#kotlin.Throwable?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-unleash-logger/d.html
+$dokka.location:io.getunleash.android.util/UnleashLogger/e/#kotlin.String?#kotlin.String#kotlin.Throwable?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-unleash-logger/e.html
+$dokka.location:io.getunleash.android.util/UnleashLogger/i/#kotlin.String?#kotlin.String#kotlin.Throwable?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-unleash-logger/i.html
+$dokka.location:io.getunleash.android.util/UnleashLogger/logLevel/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-unleash-logger/log-level.html
+$dokka.location:io.getunleash.android.util/UnleashLogger/v/#kotlin.String?#kotlin.String#kotlin.Throwable?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-unleash-logger/v.html
+$dokka.location:io.getunleash.android.util/UnleashLogger/w/#kotlin.String?#kotlin.String#kotlin.Throwable?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.util/-unleash-logger/w.html
 $dokka.location:io.getunleash.android////PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/index.html
 $dokka.location:io.getunleash.android//disabledVariant/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/disabled-variant.html
 $dokka.location:io.getunleash.android//unleashExceptionHandler/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/unleash-exception-handler.html
@@ -353,4 +372,5 @@ io.getunleash.android.http
 io.getunleash.android.metrics
 io.getunleash.android.polling
 io.getunleash.android.tasks
+io.getunleash.android.util
 
