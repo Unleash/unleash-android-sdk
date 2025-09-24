@@ -145,10 +145,10 @@ class DefaultUnleash(
         }
     }
 
-    fun start(
-        eventListeners: List<UnleashListener> = emptyList(),
-        bootstrapFile: File? = null,
-        bootstrap: List<Toggle> = emptyList()
+    override fun start(
+        eventListeners: List<UnleashListener>,
+        bootstrapFile: File?,
+        bootstrap: List<Toggle>
     ) {
         if (!started.compareAndSet(false, true)) {
             Log.w(TAG, "Unleash already started, ignoring start call")
