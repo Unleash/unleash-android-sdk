@@ -13,7 +13,7 @@ assertj = "3.26.3"
 lifecycleProcess = "2.8.4"
 kotlinxCoroutinesTest = "1.8.1"
 activityCompose = "1.9.1"
-runtimeLivedata = "1.6.8"
+runtimeLivedata = "1.9.2"
 material3 = "1.2.1"
 
 [libraries]
