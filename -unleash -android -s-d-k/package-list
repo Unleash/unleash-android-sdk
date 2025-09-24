@@ -314,6 +314,7 @@ $dokka.location:io.getunleash.android/Unleash/sendMetricsNowAsync/#/PointingToDe
 $dokka.location:io.getunleash.android/Unleash/setContext/#io.getunleash.android.data.UnleashContext/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/set-context.html
 $dokka.location:io.getunleash.android/Unleash/setContextAsync/#io.getunleash.android.data.UnleashContext/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/set-context-async.html
 $dokka.location:io.getunleash.android/Unleash/setContextWithTimeout/#io.getunleash.android.data.UnleashContext#kotlin.Long/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/set-context-with-timeout.html
+$dokka.location:io.getunleash.android/Unleash/start/#kotlin.collections.List[io.getunleash.android.events.UnleashListener]#java.io.File?#kotlin.collections.List[io.getunleash.android.data.Toggle]/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/start.html
 $dokka.location:io.getunleash.android/UnleashConfig.Builder///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-builder/index.html
 $dokka.location:io.getunleash.android/UnleashConfig.Builder/Builder/#kotlin.String#kotlin.String?#kotlin.String?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-builder/-builder.html
 $dokka.location:io.getunleash.android/UnleashConfig.Builder/build/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-builder/build.html
