@@ -1,5 +1,6 @@
 package io.getunleash.android.backup
 
+import android.util.Log
 import io.getunleash.android.BaseTest
 import io.getunleash.android.data.UnleashContext
 import io.getunleash.android.data.UnleashState
@@ -63,6 +64,7 @@ class LocalBackupTest : BaseTest() {
 
     @Test
     fun `does not write to disk when state does not change`() {
+        ShadowLog.setLoggable("io.getunleash", Log.DEBUG)
         val tmpDir = createTempDirectory().toFile()
         val context = UnleashContext(userId = "123")
         val state = UnleashState(context, emptyMap())
