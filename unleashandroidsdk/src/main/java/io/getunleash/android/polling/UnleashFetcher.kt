@@ -9,7 +9,7 @@ import io.getunleash.android.errors.ServerException
 import io.getunleash.android.events.HeartbeatEvent
 import io.getunleash.android.http.Throttler
 import io.getunleash.android.unleashScope
-import io.getunleash.android.util.LoggerWrapper
+import io.getunleash.android.util.UnleashLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -93,16 +93,16 @@ open class UnleashFetcher(
 
     suspend fun refreshTogglesIfContextChanged(ctx: UnleashContext): ToggleResponse {
         if (ctx == contextForLastFetch) {
-            LoggerWrapper.d(TAG, "Context unchanged, skipping refresh toggles")
+            UnleashLogger.d(TAG, "Context unchanged, skipping refresh toggles")
             return ToggleResponse(Status.NOT_MODIFIED)
         }
-        LoggerWrapper.d(TAG, "Unleash context changed: $ctx")
+        UnleashLogger.d(TAG, "Unleash context changed: $ctx")
         return refreshTogglesWithContext(ctx)
     }
 
     private suspend fun refreshTogglesWithContext(ctx: UnleashContext): ToggleResponse {
         val response = throttler.runIfAllowed {
-             LoggerWrapper.d(TAG, "Refreshing toggles")
+             UnleashLogger.d(TAG, "Refreshing toggles")
              doFetchToggles(ctx)
          }
 
@@ -111,7 +111,7 @@ open class UnleashFetcher(
             return response
         }
 
-        LoggerWrapper.i(TAG, "Skipping refresh toggles due to throttling")
+        UnleashLogger.i(TAG, "Skipping refresh toggles due to throttling")
         fetcherHeartbeatFlow.emit(HeartbeatEvent(Status.THROTTLED))
         return ToggleResponse(Status.THROTTLED)
     }
@@ -123,7 +123,7 @@ open class UnleashFetcher(
 
             val toggles =
                     response.config!!.toggles.groupBy { it.name }.mapValues { (_, v) -> v.first() }
-            LoggerWrapper.d(
+            UnleashLogger.d(
                     TAG,
                     "Fetched new state with ${toggles.size} toggles, emitting featuresReceivedFlow"
             )
@@ -132,9 +132,9 @@ open class UnleashFetcher(
         } else {
             if (response.isFailed()) {
                 if (response.error is NotAuthorizedException) {
-                    LoggerWrapper.e(TAG, "Not authorized to fetch toggles. Double check your SDK key")
+                    UnleashLogger.e(TAG, "Not authorized to fetch toggles. Double check your SDK key")
                 } else {
-                    LoggerWrapper.i(TAG, "Failed to fetch toggles ${response.error?.message}", response.error)
+                    UnleashLogger.i(TAG, "Failed to fetch toggles ${response.error?.message}", response.error)
                 }
             }
         }
@@ -165,17 +165,17 @@ open class UnleashFetcher(
                                 )
                 )
             } else if (inFlightCall != null && !inFlightCall.isCanceled() && !inFlightCall.isExecuted()) {
-                LoggerWrapper.d(
+                UnleashLogger.d(
                         TAG,
                         "Cancelling previous ${inFlightCall.request().method} ${inFlightCall.request().url}"
                 )
                 inFlightCall.cancel()
             }
 
-            LoggerWrapper.d(TAG, "Fetching toggles from $contextUrl")
+            UnleashLogger.d(TAG, "Fetching toggles from $contextUrl")
             val response = call.await()
             response.use { res ->
-                LoggerWrapper.d(TAG, "Received status code ${res.code} from $contextUrl")
+                UnleashLogger.d(TAG, "Received status code ${res.code} from $contextUrl")
                 throttler.handle(response.code)
                 return when {
                     res.isSuccessful -> {

@@ -2,7 +2,7 @@ package io.getunleash.android.cache
 
 import android.content.Context
 import io.getunleash.android.backup.LocalStorageConfig
-import io.getunleash.android.util.LoggerWrapper
+import io.getunleash.android.util.UnleashLogger
 import java.io.File
 
 class CacheDirectoryProvider(
@@ -18,7 +18,7 @@ class CacheDirectoryProvider(
         val tempStorageDir: File = config.dir?.let { File(it) } ?: context.cacheDir
         val tempDir = File(tempStorageDir, tempDirName)
         if (!createDirectoryIfNotExists(tempDir)) {
-            LoggerWrapper.w(TAG, "Failed to create directory ${tempDir.absolutePath}")
+            UnleashLogger.w(TAG, "Failed to create directory ${tempDir.absolutePath}")
         } else {
             if (deleteOnShutdown) addShutdownHook(tempDir)
         }
@@ -27,14 +27,14 @@ class CacheDirectoryProvider(
 
     private fun createDirectoryIfNotExists(file: File): Boolean {
         if (file.exists()) {
-            LoggerWrapper.d(TAG, "Directory ${file.absolutePath} already exists")
+            UnleashLogger.d(TAG, "Directory ${file.absolutePath} already exists")
             return true
         }
         if (file.mkdirs()) {
-            LoggerWrapper.d(TAG, "Created directory ${file.absolutePath}")
+            UnleashLogger.d(TAG, "Created directory ${file.absolutePath}")
             return true
         }
-        LoggerWrapper.w(TAG, "Failed to create directory ${file.absolutePath}")
+        UnleashLogger.w(TAG, "Failed to create directory ${file.absolutePath}")
         return false
     }
 

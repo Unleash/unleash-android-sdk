@@ -30,7 +30,7 @@ import io.getunleash.android.metrics.NoOpMetrics
 import io.getunleash.android.polling.UnleashFetcher
 import io.getunleash.android.tasks.DataJob
 import io.getunleash.android.tasks.LifecycleAwareTaskManager
-import io.getunleash.android.util.LoggerWrapper
+import io.getunleash.android.util.UnleashLogger
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -56,7 +56,7 @@ import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 
 val unleashExceptionHandler = CoroutineExceptionHandler { _, exception ->
-    LoggerWrapper.e("UnleashHandler", "Caught unhandled exception: ${exception.message}", exception)
+    UnleashLogger.e("UnleashHandler", "Caught unhandled exception: ${exception.message}", exception)
 }
 
 private val job = SupervisorJob()
@@ -151,7 +151,7 @@ class DefaultUnleash(
         bootstrap: List<Toggle>
     ) {
         if (!started.compareAndSet(false, true)) {
-            LoggerWrapper.w(TAG, "Unleash already started, ignoring start call")
+            UnleashLogger.w(TAG, "Unleash already started, ignoring start call")
             return
         }
         initialListeners.forEach { addUnleashEventListener(it) }
@@ -170,14 +170,14 @@ class DefaultUnleash(
         cache.subscribeTo(fetcher.getFeaturesReceivedFlow())
         lifecycle.addObserver(taskManager)
         if (bootstrapFile != null && bootstrapFile.exists()) {
-            LoggerWrapper.i(TAG, "Using provided bootstrap file")
+            UnleashLogger.i(TAG, "Using provided bootstrap file")
             Parser.proxyResponseAdapter.fromJson(bootstrapFile.readText())?.let { state ->
                 val toggles = state.toggles.groupBy { it.name }
                     .mapValues { (_, v) -> v.first() }
                 cache.write(UnleashState(unleashContextState.value, toggles))
             }
         } else if (bootstrap.isNotEmpty()) {
-            LoggerWrapper.i(TAG, "Using provided bootstrap toggles")
+            UnleashLogger.i(TAG, "Using provided bootstrap toggles")
             cache.write(UnleashState(unleashContextState.value, bootstrap.associateBy { it.name }))
         }
     }
@@ -213,13 +213,13 @@ class DefaultUnleash(
                 // subscribe to feature updates from upstream
                 localBackup.subscribeTo(fetcher.getFeaturesReceivedFlow())
                 unleashContextState.asStateFlow().takeWhile { !ready.get() }.collect { ctx ->
-                    LoggerWrapper.d(TAG, "Loading state from backup for $ctx")
+                    UnleashLogger.d(TAG, "Loading state from backup for $ctx")
                     localBackup.loadFromDisc(unleashContextState.value)?.let { state ->
                         if (!ready.get()) {
-                            LoggerWrapper.i(TAG, "Loaded state from backup for $ctx")
+                            UnleashLogger.i(TAG, "Loaded state from backup for $ctx")
                             cache.write(state)
                         } else {
-                            LoggerWrapper.d(TAG, "Ignoring backup, Unleash is already ready")
+                            UnleashLogger.d(TAG, "Ignoring backup, Unleash is already ready")
                         }
                     }
                 }
@@ -336,7 +336,7 @@ class DefaultUnleash(
         if (listener is UnleashReadyListener) {
             val job = coroutineScope.launch {
                 readyOnFeaturesReceived()
-                LoggerWrapper.d(TAG, "Notifying UnleashReadyListener")
+                UnleashLogger.d(TAG, "Notifying UnleashReadyListener")
                 listener.onReady()
             }
             registerListenerJob(listener, job)
@@ -391,9 +391,9 @@ class DefaultUnleash(
         val first = cache.getUpdatesFlow().first { it ->
             it.toggles.isNotEmpty()
         }
-        LoggerWrapper.d(TAG, "Received first cache update: $first")
+        UnleashLogger.d(TAG, "Received first cache update: $first")
         if (ready.compareAndSet(false, true)) {
-            LoggerWrapper.d(TAG, "Unleash state changed to ready")
+            UnleashLogger.d(TAG, "Unleash state changed to ready")
         }
     }
 
@@ -408,9 +408,9 @@ class DefaultUnleash(
 
 private fun getLifecycle(androidContext: Context) =
     if (androidContext is LifecycleOwner) {
-        LoggerWrapper.d("Unleash", "Using lifecycle from Android context")
+        UnleashLogger.d("Unleash", "Using lifecycle from Android context")
         androidContext.lifecycle
     } else {
-        LoggerWrapper.d("Unleash", "Using lifecycle from ProcessLifecycleOwner")
+        UnleashLogger.d("Unleash", "Using lifecycle from ProcessLifecycleOwner")
         ProcessLifecycleOwner.get().lifecycle
     }

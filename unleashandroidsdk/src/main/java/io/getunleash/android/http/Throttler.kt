@@ -1,6 +1,6 @@
 package io.getunleash.android.http
 
-import io.getunleash.android.util.LoggerWrapper
+import io.getunleash.android.util.UnleashLogger
 import java.net.HttpURLConnection
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.max
@@ -75,23 +75,23 @@ class Throttler(
             || responseCode == HttpURLConnection.HTTP_FORBIDDEN
         ) {
             maximizeSkips()
-            LoggerWrapper.e(TAG,
+            UnleashLogger.e(TAG,
                 "Client was not authorized to talk to the Unleash API at $target. Backing off to $maxSkips times our poll interval (of $intervalLengthInSeconds seconds) to avoid overloading server",
             )
         }
         if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
             maximizeSkips()
-            LoggerWrapper.e(TAG,
+            UnleashLogger.e(TAG,
                 "Server said that the endpoint at $target does not exist. Backing off to $maxSkips times our poll interval (of $intervalLengthInSeconds seconds) to avoid overloading server",
             )
         } else if (responseCode == 429) {
             increaseSkipCount()
-            LoggerWrapper.i(TAG,
+            UnleashLogger.i(TAG,
                 "RATE LIMITED for the ${failures.get()}. time. Further backing off. Current backoff at ${skips.get()} times our interval (of $intervalLengthInSeconds seconds)",
             )
         } else if (responseCode >= HttpURLConnection.HTTP_INTERNAL_ERROR) {
             increaseSkipCount()
-            LoggerWrapper.i(TAG,
+            UnleashLogger.i(TAG,
                 "Server failed with a $responseCode status code. Backing off. Current backoff at ${skips.get()} times our poll interval (of $intervalLengthInSeconds seconds)",
             )
         }

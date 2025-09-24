@@ -4,7 +4,7 @@ import io.getunleash.android.UnleashConfig
 import io.getunleash.android.data.Parser.metricsBodyAdapter
 import io.getunleash.android.data.Variant
 import io.getunleash.android.http.Throttler
-import io.getunleash.android.util.LoggerWrapper
+import io.getunleash.android.util.UnleashLogger
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Headers.Companion.toHeaders
@@ -41,15 +41,15 @@ class MetricsSender(
 
     override suspend fun sendMetrics(onComplete: ((Result<Unit>) -> Unit)?) {
         if (metricsUrl == null) {
-            LoggerWrapper.d(TAG, "No proxy URL configured, skipping metrics reporting")
+            UnleashLogger.d(TAG, "No proxy URL configured, skipping metrics reporting")
             return
         }
         if (bucket.isEmpty()) {
-            LoggerWrapper.d(TAG, "No metrics to report")
+            UnleashLogger.d(TAG, "No metrics to report")
             return
         }
         if (!inFlight.compareAndSet(false, true)) {
-            LoggerWrapper.d(TAG, "Metrics report already in-flight, skipping this send")
+            UnleashLogger.d(TAG, "Metrics report already in-flight, skipping this send")
             return
         }
         throttler.runIfAllowed {
@@ -72,13 +72,13 @@ class MetricsSender(
                     try {
                         onComplete?.invoke(Result.failure(e))
                     } catch (t: Throwable) {
-                        LoggerWrapper.w(TAG, "onComplete callback threw", t)
+                        UnleashLogger.w(TAG, "onComplete callback threw", t)
                     }
-                    LoggerWrapper.i(TAG, "Failed to report metrics for interval", e)
+                    UnleashLogger.i(TAG, "Failed to report metrics for interval", e)
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    LoggerWrapper.d(
+                    UnleashLogger.d(
                         TAG,
                         "Received status code ${response.code} from ${request.method} $metricsUrl"
                     )
@@ -89,7 +89,7 @@ class MetricsSender(
                     try {
                         onComplete?.invoke(Result.success(Unit))
                     } catch (t: Throwable) {
-                        LoggerWrapper.w(TAG, "onComplete callback threw", t)
+                        UnleashLogger.w(TAG, "onComplete callback threw", t)
                     }
                 }
             })

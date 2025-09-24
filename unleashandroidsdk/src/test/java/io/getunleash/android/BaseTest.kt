@@ -1,7 +1,7 @@
 package io.getunleash.android
 
 import io.getunleash.android.util.LogLevel
-import io.getunleash.android.util.LoggerWrapper
+import io.getunleash.android.util.UnleashLogger
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -16,7 +16,7 @@ abstract class BaseTest {
 
     @Before
     fun setup() {
-        LoggerWrapper.logLevel = LogLevel.DEBUG
+        UnleashLogger.logLevel = LogLevel.DEBUG
         ShadowLog.stream = System.out
         // Add a timestamp to the log output
         val df  = SimpleDateFormat("[yyyy-MM-dd'T'HH:mm:ss.SSSZ]")

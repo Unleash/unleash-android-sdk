@@ -8,8 +8,8 @@ import android.util.Log
  *  - Single stable base tag so hosts can filter via `adb shell setprop log.tag.io.getunleash LEVEL`.
  *  - Respect both a runtime min level and `Log.isLoggable(baseTag, level)`.
  */
-object LoggerWrapper {
-    var baseTag: String = "io.getunleash"
+object UnleashLogger {
+    private var baseTag: String = "io.getunleash"
 
     var logLevel: LogLevel = LogLevel.WARN
 

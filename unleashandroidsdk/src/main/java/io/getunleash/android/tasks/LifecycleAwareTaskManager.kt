@@ -6,7 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import io.getunleash.android.data.DataStrategy
 import io.getunleash.android.http.NetworkListener
 import io.getunleash.android.unleashScope
-import io.getunleash.android.util.LoggerWrapper
+import io.getunleash.android.util.UnleashLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,7 +32,7 @@ class LifecycleAwareTaskManager(
 
     internal fun startForegroundJobs() {
         if (!networkAvailable) {
-            LoggerWrapper.d(TAG, "Network not available, not starting foreground jobs")
+            UnleashLogger.d(TAG, "Network not available, not starting foreground jobs")
             return
         }
         if (!isForeground) {
@@ -40,7 +40,7 @@ class LifecycleAwareTaskManager(
 
             dataJobs.forEach { dataJob ->
                 if (foregroundWorkers[dataJob.id]?.isActive != true) {
-                    LoggerWrapper.d(TAG, "Starting foreground job: ${dataJob.id}")
+                    UnleashLogger.d(TAG, "Starting foreground job: ${dataJob.id}")
                     foregroundWorkers[dataJob.id] = startWithStrategy(
                         dataJob.id,
                         dataJob.strategy,
@@ -57,10 +57,10 @@ class LifecycleAwareTaskManager(
 
             dataJobs.forEach { dataJob ->
                 if (dataJob.strategy.pauseOnBackground || isDestroying || !networkAvailable) {
-                    LoggerWrapper.d(TAG, "Pausing foreground job: ${dataJob.id}")
+                    UnleashLogger.d(TAG, "Pausing foreground job: ${dataJob.id}")
                     foregroundWorkers[dataJob.id]?.cancel()
                 } else {
-                    LoggerWrapper.d(TAG, "Keeping job running: ${dataJob.id}")
+                    UnleashLogger.d(TAG, "Keeping job running: ${dataJob.id}")
                 }
             }
         }
@@ -78,7 +78,7 @@ class LifecycleAwareTaskManager(
                     if (strategy.delay > 0) {
                         delay(strategy.delay)
                     }
-                    LoggerWrapper.d(TAG, "[$id] Executing action within $ioContext")
+                    UnleashLogger.d(TAG, "[$id] Executing action within $ioContext")
                     action()
                     delay(timeMillis = strategy.interval)
                 }
@@ -92,7 +92,7 @@ class LifecycleAwareTaskManager(
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-        LoggerWrapper.d(TAG, "Lifecycle state changed: $event")
+        UnleashLogger.d(TAG, "Lifecycle state changed: $event")
         when (event) {
             Lifecycle.Event.ON_START, Lifecycle.Event.ON_RESUME -> startForegroundJobs()
             Lifecycle.Event.ON_STOP, Lifecycle.Event.ON_PAUSE -> stopForegroundJobs()
@@ -105,13 +105,13 @@ class LifecycleAwareTaskManager(
     }
 
     override fun onAvailable() {
-        LoggerWrapper.d(TAG, "Network available")
+        UnleashLogger.d(TAG, "Network available")
         networkAvailable = true
         startForegroundJobs()
     }
 
     override fun onLost() {
-        LoggerWrapper.d(TAG, "Network connection lost")
+        UnleashLogger.d(TAG, "Network connection lost")
         networkAvailable = false
         stopForegroundJobs()
     }
