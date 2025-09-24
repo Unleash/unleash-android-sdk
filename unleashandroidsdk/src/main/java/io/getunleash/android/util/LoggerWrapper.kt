@@ -2,47 +2,59 @@ package io.getunleash.android.util
 
 import android.util.Log
 
-internal object LoggerWrapper {
-    
-    var logLevel = LogLevel.NONE
-    
-    fun e(tag: String?, msg: String, tr: Throwable? = null) {
-        if (logLevel < LogLevel.ERROR) return
+/**
+ * Central logging wrapper for the SDK.
+ *
+ *  - Single stable base tag so hosts can filter via `adb shell setprop log.tag.io.getunleash LEVEL`.
+ *  - Respect both a runtime min level and `Log.isLoggable(baseTag, level)`.
+ */
+object LoggerWrapper {
+    var baseTag: String = "io.getunleash"
 
-        Log.e(tag, msg, tr)
+    var logLevel: LogLevel = LogLevel.WARN
+
+    fun e(tag: String?, msg: String, tr: Throwable? = null) {
+        if (!enabled(Log.ERROR)) return
+
+        Log.e("$baseTag/$tag", msg, tr)
     }
 
     fun w(tag: String?, msg: String, tr: Throwable? = null) {
-        if (logLevel < LogLevel.WARN) return
+        if (!enabled(Log.WARN)) return
 
-        Log.w(tag, msg, tr)
+        Log.w("$baseTag/$tag", msg, tr)
     }
-    
+
     fun i(tag: String?, msg: String, tr: Throwable? = null) {
-        if (logLevel < LogLevel.INFO) return
+        if (!enabled(Log.INFO)) return
 
-        Log.i(tag, msg, tr)
+        Log.i("$baseTag/$tag", msg, tr)
     }
-    
-    fun d(tag: String?, msg: String, tr: Throwable? = null) {
-        if (logLevel < LogLevel.DEBUG) return
 
-        Log.d(tag, msg, tr)
+    fun d(tag: String?, msg: String, tr: Throwable? = null) {
+        if (!enabled(Log.DEBUG)) return
+
+        Log.d("$baseTag/$tag", msg, tr)
     }
 
     fun v(tag: String?, msg: String, tr: Throwable? = null) {
-        if (logLevel < LogLevel.VERBOSE) return
+        if (!enabled(Log.VERBOSE)) return
 
-        Log.v(tag, msg, tr)
+        Log.v("$baseTag/$tag", msg, tr)
     }
-    
-}
 
-enum class LogLevel {
-    NONE,
-    ERROR,
-    WARN,
-    INFO,
-    DEBUG,
-    VERBOSE
+    private fun enabled(priority: Int): Boolean {
+        if (logLevel == LogLevel.NONE) return false
+        if (priority < logLevel.priority) return false
+        // Honor system property-based filtering: `adb shell setprop log.tag.<base> LEVEL`
+        return Log.isLoggable(baseTag, priority)
+    }
+}
+enum class LogLevel(val priority: Int) {
+    NONE(Int.MAX_VALUE),
+    ERROR(Log.ERROR),
+    WARN(Log.WARN),
+    INFO(Log.INFO),
+    DEBUG(Log.DEBUG),
+    VERBOSE(Log.VERBOSE)
 }
