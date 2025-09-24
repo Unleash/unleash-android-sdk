@@ -1,12 +1,12 @@
 package io.getunleash.android.backup
 
-import android.util.Log
 import com.squareup.moshi.JsonAdapter
 import io.getunleash.android.data.Parser.moshi
 import io.getunleash.android.data.Toggle
 import io.getunleash.android.data.UnleashContext
 import io.getunleash.android.data.UnleashState
 import io.getunleash.android.unleashScope
+import io.getunleash.android.util.UnleashLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ open class LocalBackup(
                         lastContext = it.context
                         writeToDisc(it)
                     } else {
-                        Log.d(TAG, "Context unchanged, not writing to disc")
+                        UnleashLogger.d(TAG, "Context unchanged, not writing to disc")
                     }
                 }
             }
@@ -58,9 +58,9 @@ open class LocalBackup(
                     )
                 ).toByteArray(Charsets.UTF_8)
             )
-            Log.d(TAG, "Written state to ${contextBackup.absolutePath}")
+            UnleashLogger.d(TAG, "Written state to ${contextBackup.absolutePath}")
         } catch (e: Exception) {
-            Log.i(TAG, "Error writing to disc", e)
+            UnleashLogger.i(TAG, "Error writing to disc", e)
         }
     }
 
@@ -71,15 +71,15 @@ open class LocalBackup(
                 val backupState =
                     backupAdapter.fromJson(stateBackup.readText(Charsets.UTF_8)) ?: return null
                 if (backupState.contextId != id(context)) {
-                    Log.i(TAG, "Context id mismatch, ignoring backup for context id ${backupState.contextId}")
+                    UnleashLogger.i(TAG, "Context id mismatch, ignoring backup for context id ${backupState.contextId}")
                     return null
                 }
                 return UnleashState(context, backupState.toggles)
             } else {
-                Log.d(TAG, "No backup found at ${stateBackup.absolutePath}")
+                UnleashLogger.d(TAG, "No backup found at ${stateBackup.absolutePath}")
             }
         } catch (e: Exception) {
-            Log.w(TAG, "Error loading from disc ${stateBackup.absolutePath}", e)
+            UnleashLogger.w(TAG, "Error loading from disc ${stateBackup.absolutePath}", e)
         }
         return null
     }
