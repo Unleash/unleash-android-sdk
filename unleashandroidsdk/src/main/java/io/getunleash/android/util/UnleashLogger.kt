@@ -44,10 +44,7 @@ object UnleashLogger {
     }
 
     private fun enabled(priority: Int): Boolean {
-        if (logLevel == LogLevel.NONE) return false
-        if (priority < logLevel.priority) return false
-        // Honor system property-based filtering: `adb shell setprop log.tag.<base> LEVEL`
-        return Log.isLoggable(baseTag, priority)
+        return logLevel != LogLevel.NONE && priority >= logLevel.priority
     }
 }
 enum class LogLevel(val priority: Int) {
