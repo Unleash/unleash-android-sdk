@@ -15,7 +15,7 @@ interface Unleash: Closeable {
      * @deprecated use [isEnabled(toggleName: String)] instead. Using default values can lead to unexpected behavior.
      * @see https://github.com/Unleash/unleash-android-sdk/issues/141
      */
-    @Deprecated("Use isEnabled(toggleName: String) instead", ReplaceWith("isEnabled(toggleName)"))
+    @Deprecated("Use isEnabled(toggleName: String) instead. See https://github.com/Unleash/unleash-android-sdk/issues/141", ReplaceWith("isEnabled(toggleName)"))
     fun isEnabled(toggleName: String, defaultValue: Boolean): Boolean
 
     /**
@@ -28,7 +28,7 @@ interface Unleash: Closeable {
      * @deprecated use [getVariant(toggleName: String)] instead. Using default values can lead to unexpected behavior.
      * @see https://github.com/Unleash/unleash-android-sdk/issues/141
      */
-    @Deprecated("Use getVariant(toggleName: String) instead", ReplaceWith("getVariant(toggleName)"))
+    @Deprecated("Use getVariant(toggleName: String) instead. See https://github.com/Unleash/unleash-android-sdk/issues/141", ReplaceWith("getVariant(toggleName)"))
     fun getVariant(toggleName: String, defaultValue: Variant = disabledVariant): Variant
 
     /**

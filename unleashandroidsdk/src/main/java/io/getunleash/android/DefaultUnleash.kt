@@ -239,7 +239,7 @@ class DefaultUnleash(
     }
 
     @Deprecated(
-        "Use isEnabled(toggleName: String) instead",
+        "Use isEnabled(toggleName: String) instead. See https://github.com/Unleash/unleash-android-sdk/issues/141",
         replaceWith = ReplaceWith("isEnabled(toggleName)")
     )
     override fun isEnabled(toggleName: String, defaultValue: Boolean): Boolean {
@@ -266,7 +266,7 @@ class DefaultUnleash(
     }
 
     @Deprecated(
-        "Use getVariant(toggleName: String) instead",
+        "Use getVariant(toggleName: String) instead. See https://github.com/Unleash/unleash-android-sdk/issues/141",
         replaceWith = ReplaceWith("getVariant(toggleName)")
     )
     override fun getVariant(toggleName: String, defaultValue: Variant): Variant {
