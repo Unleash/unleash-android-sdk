@@ -227,6 +227,21 @@ class DefaultUnleash(
         }
     }
 
+    override fun isEnabled(toggleName: String): Boolean {
+        val toggle = cache.get(toggleName)
+        val enabled = toggle?.enabled ?: false
+        val impressionData = unleashConfig.forceImpressionData || toggle?.impressionData ?: false
+        if (impressionData) {
+            emit(ImpressionEvent(toggleName, enabled, unleashContextState.value))
+        }
+        metrics.count(toggleName, enabled)
+        return enabled
+    }
+
+    @Deprecated(
+        "Use isEnabled(toggleName: String) instead",
+        replaceWith = ReplaceWith("isEnabled(toggleName)")
+    )
     override fun isEnabled(toggleName: String, defaultValue: Boolean): Boolean {
         val toggle = cache.get(toggleName)
         val enabled = toggle?.enabled ?: defaultValue
@@ -238,6 +253,22 @@ class DefaultUnleash(
         return enabled
     }
 
+    override fun getVariant(toggleName: String): Variant {
+        val toggle = cache.get(toggleName)
+        val enabled = isEnabled(toggleName)
+        val variant = if (enabled) (toggle?.variant ?: disabledVariant) else disabledVariant
+        val impressionData = toggle?.impressionData ?: unleashConfig.forceImpressionData
+        if (impressionData) {
+            emit(ImpressionEvent(toggleName, enabled, unleashContextState.value, variant.name))
+        }
+        metrics.countVariant(toggleName, variant)
+        return variant
+    }
+
+    @Deprecated(
+        "Use getVariant(toggleName: String) instead",
+        replaceWith = ReplaceWith("getVariant(toggleName)")
+    )
     override fun getVariant(toggleName: String, defaultValue: Variant): Variant {
         val toggle = cache.get(toggleName)
         val enabled = isEnabled(toggleName)
