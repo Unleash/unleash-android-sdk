@@ -309,7 +309,9 @@ $dokka.location:io.getunleash.android/DefaultUnleash/DefaultUnleash/#android.con
 $dokka.location:io.getunleash.android/DefaultUnleash/addUnleashEventListener/#io.getunleash.android.events.UnleashListener/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/add-unleash-event-listener.html
 $dokka.location:io.getunleash.android/DefaultUnleash/close/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/close.html
 $dokka.location:io.getunleash.android/DefaultUnleash/getVariant/#kotlin.String#io.getunleash.android.data.Variant/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/get-variant.html
+$dokka.location:io.getunleash.android/DefaultUnleash/getVariant/#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/get-variant.html
 $dokka.location:io.getunleash.android/DefaultUnleash/isEnabled/#kotlin.String#kotlin.Boolean/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/is-enabled.html
+$dokka.location:io.getunleash.android/DefaultUnleash/isEnabled/#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/is-enabled.html
 $dokka.location:io.getunleash.android/DefaultUnleash/isReady/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/is-ready.html
 $dokka.location:io.getunleash.android/DefaultUnleash/refreshTogglesNow/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/refresh-toggles-now.html
 $dokka.location:io.getunleash.android/DefaultUnleash/refreshTogglesNowAsync/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-default-unleash/refresh-toggles-now-async.html
@@ -323,7 +325,9 @@ $dokka.location:io.getunleash.android/DefaultUnleash/start/#kotlin.collections.L
 $dokka.location:io.getunleash.android/Unleash///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/index.html
 $dokka.location:io.getunleash.android/Unleash/addUnleashEventListener/#io.getunleash.android.events.UnleashListener/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/add-unleash-event-listener.html
 $dokka.location:io.getunleash.android/Unleash/getVariant/#kotlin.String#io.getunleash.android.data.Variant/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/get-variant.html
+$dokka.location:io.getunleash.android/Unleash/getVariant/#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/get-variant.html
 $dokka.location:io.getunleash.android/Unleash/isEnabled/#kotlin.String#kotlin.Boolean/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/is-enabled.html
+$dokka.location:io.getunleash.android/Unleash/isEnabled/#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/is-enabled.html
 $dokka.location:io.getunleash.android/Unleash/isReady/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/is-ready.html
 $dokka.location:io.getunleash.android/Unleash/refreshTogglesNow/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/refresh-toggles-now.html
 $dokka.location:io.getunleash.android/Unleash/refreshTogglesNowAsync/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash/refresh-toggles-now-async.html
