@@ -1,22 +1,40 @@
 package io.getunleash.android
 
+import io.getunleash.android.data.Toggle
 import io.getunleash.android.data.UnleashContext
 import io.getunleash.android.data.Variant
 import io.getunleash.android.events.UnleashListener
 import java.io.Closeable
+import java.io.File
 
 val disabledVariant = Variant("disabled")
 
 interface Unleash: Closeable {
     /**
      * Check if a toggle is enabled or disabled
+     * @deprecated use [isEnabled(toggleName: String)] instead. Using default values can lead to unexpected behavior.
+     * @see https://github.com/Unleash/unleash-android-sdk/issues/141
      */
-    fun isEnabled(toggleName: String, defaultValue: Boolean = false): Boolean
+    @Deprecated("Use isEnabled(toggleName: String) instead. See https://github.com/Unleash/unleash-android-sdk/issues/141", ReplaceWith("isEnabled(toggleName)"))
+    fun isEnabled(toggleName: String, defaultValue: Boolean): Boolean
+
+    /**
+     * Check if a toggle is enabled or disabled
+     */
+    fun isEnabled(toggleName: String): Boolean
+
+    /**
+     * Get the variant for a toggle
+     * @deprecated use [getVariant(toggleName: String)] instead. Using default values can lead to unexpected behavior.
+     * @see https://github.com/Unleash/unleash-android-sdk/issues/141
+     */
+    @Deprecated("Use getVariant(toggleName: String) instead. See https://github.com/Unleash/unleash-android-sdk/issues/141", ReplaceWith("getVariant(toggleName)"))
+    fun getVariant(toggleName: String, defaultValue: Variant = disabledVariant): Variant
 
     /**
      * Get the variant for a toggle
      */
-    fun getVariant(toggleName: String, defaultValue: Variant = disabledVariant): Variant
+    fun getVariant(toggleName: String): Variant
 
     /**
      * Set context and trigger a fetch of the latest toggles immediately and block until the fetch is complete or failed.
@@ -70,4 +88,13 @@ interface Unleash: Closeable {
      * once the initial fetch of toggles has been completed or failed.
      */
     fun isReady(): Boolean
+
+    /**
+     * Starts Unleash manually
+     */
+    fun start(
+        eventListeners: List<UnleashListener> = emptyList(),
+        bootstrapFile: File? = null,
+        bootstrap: List<Toggle> = emptyList()
+    )
 }
