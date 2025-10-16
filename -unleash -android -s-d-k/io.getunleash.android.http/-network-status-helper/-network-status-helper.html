@@ -61,12 +61,14 @@
                 <div class="sidebar--inner" id="sideMenu"></div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="member" id="content" pageIds="Unleash Android SDK::io.getunleash.android.http/NetworkStatusHelper/NetworkStatusHelper/#android.content.Context/PointingToDeclaration//-1069558929">
+<div class="main-content" data-page-type="member" id="content" pageIds="Unleash Android SDK::io.getunleash.android.http/NetworkStatusHelper/NetworkStatusHelper/#android.content.Context#kotlin.Function2[kotlin.Long,kotlin.Function0[kotlin.Unit],kotlin.Unit]/PointingToDeclaration//-1069558929">
   <div class="breadcrumbs"><a href="../../../index.html">Unleash Android SDK</a><span class="delimiter">/</span><a href="../index.html">io.getunleash.android.http</a><span class="delimiter">/</span><a href="index.html">NetworkStatusHelper</a><span class="delimiter">/</span><span class="current">NetworkStatusHelper</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Network</span><wbr></wbr><span>Status</span><wbr></wbr><span><span>Helper</span></span></h1>
   </div>
-  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a></span></span><span class="token punctuation">)</span></div></div></div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable=":unleashandroidsdk:dokkaHtml/release"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="https://developer.android.com/reference/kotlin/android/content/Context.html">Context</a><span class="token punctuation">, </span></span><span class="parameter ">scheduleRetry<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-long/index.html">Long</a><span class="token punctuation">, </span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator"> = </span>{ delayMs, action -&gt;
+        Handler(Looper.getMainLooper()).postDelayed(action, delayMs)
+    }</span></span><span class="token punctuation">)</span></div></div></div>
 </div>
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span
