@@ -188,6 +188,68 @@ class NetworkStatusHelperTest : BaseTest() {
             .registerNetworkCallback(any(), any<ConnectivityManager.NetworkCallback>())
     }
 
+    @Test
+    fun `close swallows IllegalArgumentException when unregistering callback`() {
+        val context = mock(Context::class.java)
+        val connectivityManager = mock(ConnectivityManager::class.java)
+        val callback = mock(ConnectivityManager.NetworkCallback::class.java)
+        `when`(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
+        doThrow(IllegalArgumentException("already unregistered"))
+            .`when`(connectivityManager)
+            .unregisterNetworkCallback(callback)
+
+        val networkStatusHelper = NetworkStatusHelper(context)
+        networkStatusHelper.networkCallbacks += callback
+
+        networkStatusHelper.close()
+
+        verify(connectivityManager).unregisterNetworkCallback(callback)
+        assertThat(networkStatusHelper.networkCallbacks).isEmpty()
+    }
+
+    @Test
+    fun `close does not trigger retry attempts scheduled before closing`() {
+        val context = mock(Context::class.java)
+        val connectivityManager = mock(ConnectivityManager::class.java)
+        `when`(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
+        doThrow(SecurityException("binder race"))
+            .`when`(connectivityManager)
+            .registerNetworkCallback(any(), any<ConnectivityManager.NetworkCallback>())
+
+        val scheduledActions = mutableListOf<() -> Unit>()
+        val networkStatusHelper = NetworkStatusHelper(
+            context,
+            scheduleRetry = { _, action -> scheduledActions.add(action) }
+        )
+
+        networkStatusHelper.registerNetworkListener(mock(NetworkListener::class.java))
+        assertThat(scheduledActions).hasSize(1)
+
+        networkStatusHelper.close()
+
+        scheduledActions.removeAt(0).invoke()
+
+        verify(connectivityManager, times(1))
+            .registerNetworkCallback(any(), any<ConnectivityManager.NetworkCallback>())
+    }
+
+    @Test
+    fun `close can be called multiple times without unregistering twice`() {
+        val context = mock(Context::class.java)
+        val connectivityManager = mock(ConnectivityManager::class.java)
+        val callback = mock(ConnectivityManager.NetworkCallback::class.java)
+        `when`(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
+
+        val networkStatusHelper = NetworkStatusHelper(context)
+        networkStatusHelper.networkCallbacks += callback
+
+        networkStatusHelper.close()
+        networkStatusHelper.close()
+
+        verify(connectivityManager, times(1)).unregisterNetworkCallback(callback)
+        assertThat(networkStatusHelper.networkCallbacks).isEmpty()
+    }
+
     private fun contextWithNetwork(network: Network?, vararg capabilities: Int): Context {
         val context = mock(Context::class.java)
         val connectivityManager = mock(ConnectivityManager::class.java)

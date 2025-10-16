@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import io.getunleash.android.util.UnleashLogger
+import java.util.concurrent.atomic.AtomicInteger
 
 interface NetworkListener {
     fun onAvailable()
@@ -31,14 +32,23 @@ class NetworkStatusHelper(
 
     private val availableNetworks = mutableSetOf<Network>()
 
+    private val registrationEpoch = AtomicInteger(0)
+
     fun registerNetworkListener(listener: NetworkListener) {
-        registerNetworkListener(listener, MAX_REGISTRATION_ATTEMPTS)
+        val epoch = registrationEpoch.get()
+        registerNetworkListener(listener, MAX_REGISTRATION_ATTEMPTS, epoch)
     }
 
     private fun registerNetworkListener(
         listener: NetworkListener,
-        remainingAttempts: Int
+        remainingAttempts: Int,
+        epoch: Int
     ) {
+        if (epoch != registrationEpoch.get()) {
+            UnleashLogger.d(TAG, "Skipping stale network registration attempt")
+            return
+        }
+
         val attemptNumber = MAX_REGISTRATION_ATTEMPTS - remainingAttempts + 1
         try {
             val connectivityManager = getConnectivityManager() ?: return
@@ -46,16 +56,23 @@ class NetworkStatusHelper(
 
             val networkCallback = buildCallback(listener)
             connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            if (epoch != registrationEpoch.get()) {
+                UnleashLogger.d(TAG, "Registration completed for stale attempt; unregistering callback")
+                connectivityManager.unregisterNetworkCallback(networkCallback)
+                return
+            }
             networkCallbacks += networkCallback
         } catch (securityException: SecurityException) {
             if (remainingAttempts > 1) {
-                UnleashLogger.i(
+                UnleashLogger.w(
                     TAG,
                     "registerNetworkCallback failed on attempt $attemptNumber/$MAX_REGISTRATION_ATTEMPTS; retrying in $REGISTRATION_RETRY_DELAY_MS ms",
                     securityException
                 )
-                scheduleRetry(REGISTRATION_RETRY_DELAY_MS) {
-                    registerNetworkListener(listener, remainingAttempts - 1)
+                if (epoch == registrationEpoch.get()) {
+                    scheduleRetry(REGISTRATION_RETRY_DELAY_MS) {
+                        registerNetworkListener(listener, remainingAttempts - 1, epoch)
+                    }
                 }
             } else {
                 UnleashLogger.w(
@@ -68,9 +85,31 @@ class NetworkStatusHelper(
     }
 
     fun close() {
-        val connectivityManager = getConnectivityManager() ?: return
-        networkCallbacks.forEach {
-            connectivityManager.unregisterNetworkCallback(it)
+        val epoch = registrationEpoch.incrementAndGet()
+        val connectivityManager = getConnectivityManager() ?: run {
+            networkCallbacks.clear()
+            availableNetworks.clear()
+            return
+        }
+        val callbacks = networkCallbacks.toList()
+        networkCallbacks.clear()
+        availableNetworks.clear()
+        callbacks.forEach { callback ->
+            try {
+                connectivityManager.unregisterNetworkCallback(callback)
+            } catch (illegalArgumentException: IllegalArgumentException) {
+                UnleashLogger.w(
+                    TAG,
+                    "NetworkCallback already unregistered during close (epoch=$epoch)",
+                    illegalArgumentException
+                )
+            } catch (securityException: SecurityException) {
+                UnleashLogger.w(
+                    TAG,
+                    "SecurityException while unregistering NetworkCallback during close (epoch=$epoch)",
+                    securityException
+                )
+            }
         }
     }
 
