@@ -9,6 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
@@ -129,6 +130,62 @@ class NetworkStatusHelperTest : BaseTest() {
         verify(listener, never()).onLost()
         networkStatusHelper.networkCallbacks[0].onLost(network2)
         verify(listener).onLost()
+    }
+
+    @Test
+    fun `retries registering callback when SecurityException occurs`() {
+        val context = mock(Context::class.java)
+        val connectivityManager = mock(ConnectivityManager::class.java)
+        `when`(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
+        doThrow(SecurityException("binder race"))
+            .doNothing()
+            .`when`(connectivityManager)
+            .registerNetworkCallback(any(), any<ConnectivityManager.NetworkCallback>())
+
+        val scheduledActions = mutableListOf<() -> Unit>()
+        val listener = mock(NetworkListener::class.java)
+
+        val networkStatusHelper = NetworkStatusHelper(
+            context,
+            scheduleRetry = { _, action -> scheduledActions.add(action) }
+        )
+
+        networkStatusHelper.registerNetworkListener(listener)
+
+        assertThat(networkStatusHelper.networkCallbacks).isEmpty()
+        assertThat(scheduledActions).hasSize(1)
+
+        scheduledActions.removeAt(0).invoke()
+
+        assertThat(networkStatusHelper.networkCallbacks).hasSize(1)
+        verify(connectivityManager, times(2))
+            .registerNetworkCallback(any(), any<ConnectivityManager.NetworkCallback>())
+    }
+
+    @Test
+    fun `gives up registering callback after max retries`() {
+        val context = mock(Context::class.java)
+        val connectivityManager = mock(ConnectivityManager::class.java)
+        `when`(context.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager)
+        doThrow(SecurityException("binder race"))
+            .`when`(connectivityManager)
+            .registerNetworkCallback(any(), any<ConnectivityManager.NetworkCallback>())
+
+        val scheduledActions = mutableListOf<() -> Unit>()
+        val networkStatusHelper = NetworkStatusHelper(
+            context,
+            scheduleRetry = { _, action -> scheduledActions.add(action) }
+        )
+
+        networkStatusHelper.registerNetworkListener(mock(NetworkListener::class.java))
+
+        while (scheduledActions.isNotEmpty()) {
+            scheduledActions.removeAt(0).invoke()
+        }
+
+        assertThat(networkStatusHelper.networkCallbacks).isEmpty()
+        verify(connectivityManager, times(NetworkStatusHelper.MAX_REGISTRATION_ATTEMPTS))
+            .registerNetworkCallback(any(), any<ConnectivityManager.NetworkCallback>())
     }
 
     private fun contextWithNetwork(network: Network?, vararg capabilities: Int): Context {

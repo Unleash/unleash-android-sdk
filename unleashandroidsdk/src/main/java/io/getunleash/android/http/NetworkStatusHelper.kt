@@ -6,6 +6,8 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import io.getunleash.android.util.UnleashLogger
 
 interface NetworkListener {
@@ -13,9 +15,16 @@ interface NetworkListener {
     fun onLost()
 }
 
-class NetworkStatusHelper(private val context: Context) {
+class NetworkStatusHelper(
+    private val context: Context,
+    private val scheduleRetry: (Long, () -> Unit) -> Unit = { delayMs, action ->
+        Handler(Looper.getMainLooper()).postDelayed(action, delayMs)
+    }
+) {
     companion object {
         private const val TAG = "NetworkState"
+        internal const val MAX_REGISTRATION_ATTEMPTS = 5
+        private const val REGISTRATION_RETRY_DELAY_MS = 200L
     }
 
     internal val networkCallbacks = mutableListOf<ConnectivityManager.NetworkCallback>()
@@ -23,31 +32,39 @@ class NetworkStatusHelper(private val context: Context) {
     private val availableNetworks = mutableSetOf<Network>()
 
     fun registerNetworkListener(listener: NetworkListener) {
-        val connectivityManager = getConnectivityManager() ?: return
-        val requestBuilder = NetworkRequest.Builder()
-            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
-        }
-        val networkRequest = requestBuilder.build()
+        registerNetworkListener(listener, MAX_REGISTRATION_ATTEMPTS)
+    }
 
-        // wrap the listener in a NetworkCallback so the listener doesn't have to know about Android specifics
-        val networkCallback = object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                availableNetworks += network
-                listener.onAvailable()
-            }
+    private fun registerNetworkListener(
+        listener: NetworkListener,
+        remainingAttempts: Int
+    ) {
+        val attemptNumber = MAX_REGISTRATION_ATTEMPTS - remainingAttempts + 1
+        try {
+            val connectivityManager = getConnectivityManager() ?: return
+            val networkRequest = buildNetworkRequest()
 
-            override fun onLost(network: Network) {
-                availableNetworks -= network
-                if (availableNetworks.isEmpty()) {
-                    listener.onLost()
+            val networkCallback = buildCallback(listener)
+            connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
+            networkCallbacks += networkCallback
+        } catch (securityException: SecurityException) {
+            if (remainingAttempts > 1) {
+                UnleashLogger.i(
+                    TAG,
+                    "registerNetworkCallback failed on attempt $attemptNumber/$MAX_REGISTRATION_ATTEMPTS; retrying in $REGISTRATION_RETRY_DELAY_MS ms",
+                    securityException
+                )
+                scheduleRetry(REGISTRATION_RETRY_DELAY_MS) {
+                    registerNetworkListener(listener, remainingAttempts - 1)
                 }
+            } else {
+                UnleashLogger.w(
+                    TAG,
+                    "registerNetworkCallback failed after $attemptNumber attempts; network updates disabled",
+                    securityException
+                )
             }
         }
-
-        connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
-        networkCallbacks += networkCallback
     }
 
     fun close() {
@@ -93,4 +110,28 @@ class NetworkStatusHelper(private val context: Context) {
     fun isAvailable(): Boolean {
         return !isAirplaneModeOn() && isNetworkAvailable()
     }
+
+    private fun buildNetworkRequest(): NetworkRequest {
+        val requestBuilder = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestBuilder.addCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        }
+        return requestBuilder.build()
+    }
+
+    private fun buildCallback(listener: NetworkListener) =
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                availableNetworks += network
+                listener.onAvailable()
+            }
+
+            override fun onLost(network: Network) {
+                availableNetworks -= network
+                if (availableNetworks.isEmpty()) {
+                    listener.onLost()
+                }
+            }
+        }
 }
