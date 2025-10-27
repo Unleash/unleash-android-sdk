@@ -107,7 +107,7 @@ publishing {
                 pom {
                     name.set("Unleash Android")
                     description.set("Android SDK for Unleash")
-                    url.set("https://gh.getunleash.io/unleash-android-sdk")
+                    url.set("https://docs.getunleash.io/reference/sdks/android")
                     licenses {
                         license {
                             name.set("MIT License")
