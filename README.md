@@ -7,7 +7,6 @@ You can use this client with [Unleash Enterprise](https://www.getunleash.io/pric
 [![Coverage Status](https://coveralls.io/repos/github/Unleash/unleash-android/badge.svg?branch=main)](https://coveralls.io/github/Unleash/unleash-android?branch=main)
 [![main](https://github.com/Unleash/unleash-android/actions/workflows/build.yaml/badge.svg)](https://github.com/Unleash/unleash-android/actions/workflows/build.yaml)
 [![latest](https://badgen.net/maven/v/maven-central/io.getunleash/unleash-android)](https://search.maven.org/search?q=g:io.getunleash%20AND%20a:unleash-android)
-[KDoc](https://unleash.github.io/unleash-android)
 
 ## Getting started
 
@@ -63,7 +62,7 @@ Your app will need internet permission in order to reach the proxy and access ne
 ### Step 3: Initialize Unleash SDK
 
 Configure your client instance (use a single instance to avoid file contention on cache directory). 
-For all configuration options check the [UnleashConfig.Builder](https://gh.getunleash.io/unleash-android/-unleash%20-android%20-s-d-k/io.getunleash.android/-unleash-config/-builder/index.html) class.
+
 ```kotlin
 val unleash = DefaultUnleash(
     androidContext = applicationContext, // likely a reference to your Android application context
