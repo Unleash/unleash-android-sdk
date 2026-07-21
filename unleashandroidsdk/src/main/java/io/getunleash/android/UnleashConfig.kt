@@ -27,6 +27,8 @@ data class UnleashConfig(
     ),
     val delayedInitialization: Boolean = true,
     val forceImpressionData: Boolean = false,
+    val sdkFlavour: String? = null,
+    val sdkFlavourVersion: String? = null,
     val httpClient: OkHttpClient? = null,
 ) {
     companion object {
@@ -61,6 +63,8 @@ data class UnleashConfig(
     ) {
         private var delayedInitialization: Boolean = true
         private var forceImpressionData: Boolean = false
+        private var sdkFlavour: String? = null
+        private var sdkFlavourVersion: String? = null
         val pollingStrategy: DataStrategy.Builder = DataStrategy()
             .newBuilder(parent = this)
         val metricsStrategy: DataStrategy.Builder = DataStrategy()
@@ -80,6 +84,8 @@ data class UnleashConfig(
                 metricsStrategy = metricsStrategy.build(),
                 delayedInitialization = delayedInitialization,
                 forceImpressionData = forceImpressionData,
+                sdkFlavour = sdkFlavour,
+                sdkFlavourVersion = sdkFlavourVersion,
                 localStorageConfig = localStorageConfig.build(),
                 httpClient = httpClient
             )
@@ -93,6 +99,11 @@ data class UnleashConfig(
 
         fun forceImpressionData(forceImpressionData: Boolean) =
             apply { this.forceImpressionData = forceImpressionData }
+
+        fun sdkFlavour(flavour: String, flavourVersion: String) = apply {
+            this.sdkFlavour = flavour
+            this.sdkFlavourVersion = flavourVersion
+        }
 
         fun httpClient(httpClient: OkHttpClient) = apply {
             this.httpClient = httpClient

@@ -43,6 +43,18 @@ class UnleashConfigTest {
     }
 
     @Test
+    fun testSdkFlavourConfig() {
+        val config = UnleashConfig.newBuilder("testApp")
+            .proxyUrl("https://io.getunleash.io/demo/proxy")
+            .clientKey("some-key")
+            .sdkFlavour("unleash-openfeature-android-provider", "1.2.3")
+            .build()
+
+        assertThat(config.sdkFlavour).isEqualTo("unleash-openfeature-android-provider")
+        assertThat(config.sdkFlavourVersion).isEqualTo("1.2.3")
+    }
+
+    @Test
     fun testDisablingMetricsAndPollingIsPossibleForTesting() {
         val config = UnleashConfig.newBuilder("testApp")
             .pollingStrategy.enabled(false)

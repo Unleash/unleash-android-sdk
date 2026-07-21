@@ -98,6 +98,27 @@ class MetricsSenderTest : BaseTest() {
     }
 
     @Test
+    fun `pushes sdk flavour metadata with metrics when configured`() = runTest {
+        val config = configBuilder
+            .sdkFlavour("unleash-openfeature-android-provider", "1.2.3")
+            .build()
+        val httpClient = ClientBuilder(config, mock(Context::class.java)).build("test", config.metricsStrategy)
+        val metricsSender = MetricsSender(config, httpClient)
+
+        metricsSender.count("feature1", true)
+        metricsSender.sendMetrics()
+        val request = server.takeRequest(
+            1,
+            TimeUnit.SECONDS
+        )!!
+
+        assertThatJson(request.body.readUtf8()) {
+            node("sdkFlavour").isString().isEqualTo("unleash-openfeature-android-provider")
+            node("sdkFlavourVersion").isString().isEqualTo("1.2.3")
+        }
+    }
+
+    @Test
     fun `failed send merges metrics back and next successful send includes both old and new`() = runTest {
         val config = configBuilder.build()
         val httpClient = ClientBuilder(config, mock(Context::class.java)).build("test", config.metricsStrategy)
