@@ -209,10 +209,12 @@ $dokka.location:io.getunleash.android.metrics/MetricsCollector/count/#kotlin.Str
 $dokka.location:io.getunleash.android.metrics/MetricsCollector/countVariant/#kotlin.String#io.getunleash.android.data.Variant/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-collector/count-variant.html
 $dokka.location:io.getunleash.android.metrics/MetricsHandler///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-handler/index.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/index.html
-$dokka.location:io.getunleash.android.metrics/MetricsPayload/MetricsPayload/#kotlin.String#kotlin.String#io.getunleash.android.metrics.Bucket/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/-metrics-payload.html
+$dokka.location:io.getunleash.android.metrics/MetricsPayload/MetricsPayload/#kotlin.String#kotlin.String#io.getunleash.android.metrics.Bucket#kotlin.String?#kotlin.String?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/-metrics-payload.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload/appName/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/app-name.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload/bucket/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/bucket.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload/instanceId/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/instance-id.html
+$dokka.location:io.getunleash.android.metrics/MetricsPayload/sdkFlavour/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/sdk-flavour.html
+$dokka.location:io.getunleash.android.metrics/MetricsPayload/sdkFlavourVersion/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/sdk-flavour-version.html
 $dokka.location:io.getunleash.android.metrics/MetricsReporter///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-reporter/index.html
 $dokka.location:io.getunleash.android.metrics/MetricsReporter/sendMetrics/#kotlin.Function1[kotlin.Result[kotlin.Unit],kotlin.Unit]?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-reporter/send-metrics.html
 $dokka.location:io.getunleash.android.metrics/MetricsSender.Companion///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-sender/-companion/index.html
@@ -350,11 +352,12 @@ $dokka.location:io.getunleash.android/UnleashConfig.Builder/localStorageConfig/#
 $dokka.location:io.getunleash.android/UnleashConfig.Builder/metricsStrategy/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-builder/metrics-strategy.html
 $dokka.location:io.getunleash.android/UnleashConfig.Builder/pollingStrategy/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-builder/polling-strategy.html
 $dokka.location:io.getunleash.android/UnleashConfig.Builder/proxyUrl/#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-builder/proxy-url.html
+$dokka.location:io.getunleash.android/UnleashConfig.Builder/sdkFlavour/#kotlin.String#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-builder/sdk-flavour.html
 $dokka.location:io.getunleash.android/UnleashConfig.Companion///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-companion/index.html
 $dokka.location:io.getunleash.android/UnleashConfig.Companion/instanceId/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-companion/instance-id.html
 $dokka.location:io.getunleash.android/UnleashConfig.Companion/newBuilder/#kotlin.String/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-companion/new-builder.html
 $dokka.location:io.getunleash.android/UnleashConfig///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/index.html
-$dokka.location:io.getunleash.android/UnleashConfig/UnleashConfig/#kotlin.String?#kotlin.String?#kotlin.String#io.getunleash.android.backup.LocalStorageConfig#io.getunleash.android.data.DataStrategy#io.getunleash.android.data.DataStrategy#kotlin.Boolean#kotlin.Boolean#okhttp3.OkHttpClient?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-unleash-config.html
+$dokka.location:io.getunleash.android/UnleashConfig/UnleashConfig/#kotlin.String?#kotlin.String?#kotlin.String#io.getunleash.android.backup.LocalStorageConfig#io.getunleash.android.data.DataStrategy#io.getunleash.android.data.DataStrategy#kotlin.Boolean#kotlin.Boolean#kotlin.String?#kotlin.String?#okhttp3.OkHttpClient?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/-unleash-config.html
 $dokka.location:io.getunleash.android/UnleashConfig/appName/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/app-name.html
 $dokka.location:io.getunleash.android/UnleashConfig/clientKey/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/client-key.html
 $dokka.location:io.getunleash.android/UnleashConfig/delayedInitialization/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/delayed-initialization.html
@@ -366,6 +369,8 @@ $dokka.location:io.getunleash.android/UnleashConfig/localStorageConfig/#/Pointin
 $dokka.location:io.getunleash.android/UnleashConfig/metricsStrategy/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/metrics-strategy.html
 $dokka.location:io.getunleash.android/UnleashConfig/pollingStrategy/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/polling-strategy.html
 $dokka.location:io.getunleash.android/UnleashConfig/proxyUrl/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/proxy-url.html
+$dokka.location:io.getunleash.android/UnleashConfig/sdkFlavour/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/sdk-flavour.html
+$dokka.location:io.getunleash.android/UnleashConfig/sdkFlavourVersion/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android/-unleash-config/sdk-flavour-version.html
 io.getunleash.android
 io.getunleash.android.backup
 io.getunleash.android.cache
