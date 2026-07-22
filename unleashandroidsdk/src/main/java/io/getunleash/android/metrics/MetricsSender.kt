@@ -57,9 +57,7 @@ class MetricsSender(
             val payload = MetricsPayload(
                 appName = config.appName,
                 instanceId = config.instanceId,
-                bucket = toReport.first,
-                sdkFlavour = config.sdkFlavour,
-                sdkFlavourVersion = config.sdkFlavourVersion
+                bucket = toReport.first
             )
             val request = Request.Builder()
                 .headers(applicationHeaders.toHeaders())

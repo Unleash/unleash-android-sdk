@@ -12,6 +12,8 @@ import java.util.UUID
  * @property appName: name of the underlying application. Will be used as default in the [io.getunleash.android.data.UnleashContext] call (Required).
  * @property pollingStrategy How to poll for features. (Optional - Defaults to [io.getunleash.android.data.DataStrategy] with poll interval set to 60 seconds).
  * @property metricsStrategy How to poll for metrics. (Optional - Defaults to [io.getunleash.android.data.DataStrategy] with poll interval set to 60 seconds).
+ * @property sdkFlavour the SDK wrapper flavor to report in request headers. (Optional)
+ * @property sdkFlavourVersion the SDK wrapper flavor version to report in request headers. (Optional)
  * @property httpClient Custom http client to be used. (Optional - Use if you want to pass in custom SSL certificates).
  */
 data class UnleashConfig(
@@ -42,6 +44,15 @@ data class UnleashConfig(
 
     fun getApplicationHeaders(strategy: DataStrategy): Map<String, String> {
         val auth = clientKey ?: ""
+        val sdkFlavourHeaders =
+            if (sdkFlavour != null && sdkFlavourVersion != null) {
+                mapOf(
+                    "unleash-sdk-flavor" to sdkFlavour,
+                    "unleash-sdk-flavor-version" to sdkFlavourVersion,
+                )
+            } else {
+                emptyMap()
+            }
         return strategy.httpCustomHeaders.plus(mapOf(
             "Authorization" to auth,
             "Content-Type" to "application/json",
@@ -50,7 +61,7 @@ data class UnleashConfig(
             "UNLEASH-INSTANCEID" to instanceId,
             "UNLEASH-CONNECTION-ID" to instanceId,
             "UNLEASH-SDK" to "unleash-android-sdk:" + BuildConfig.VERSION,
-        ))
+        )).plus(sdkFlavourHeaders)
     }
 
     /**

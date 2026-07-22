@@ -64,7 +64,5 @@ data class CountBucket(
 data class MetricsPayload(
     val appName: String,
     val instanceId: String,
-    val bucket: Bucket,
-    val sdkFlavour: String? = null,
-    val sdkFlavourVersion: String? = null
+    val bucket: Bucket
 )
