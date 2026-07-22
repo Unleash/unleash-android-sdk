@@ -98,7 +98,7 @@ class MetricsSenderTest : BaseTest() {
     }
 
     @Test
-    fun `pushes sdk flavour metadata with metrics when configured`() = runTest {
+    fun `stamps sdk flavour metadata headers on metrics requests when configured`() = runTest {
         val config = configBuilder
             .sdkFlavour("unleash-openfeature-android-provider", "1.2.3")
             .build()
@@ -112,10 +112,10 @@ class MetricsSenderTest : BaseTest() {
             TimeUnit.SECONDS
         )!!
 
-        assertThatJson(request.body.readUtf8()) {
-            node("sdkFlavour").isString().isEqualTo("unleash-openfeature-android-provider")
-            node("sdkFlavourVersion").isString().isEqualTo("1.2.3")
-        }
+        assertThat(request.getHeader("unleash-sdk-flavor"))
+            .isEqualTo("unleash-openfeature-android-provider")
+        assertThat(request.getHeader("unleash-sdk-flavor-version")).isEqualTo("1.2.3")
+        assertThat(request.body.readUtf8()).doesNotContain("sdkFlavour")
     }
 
     @Test
