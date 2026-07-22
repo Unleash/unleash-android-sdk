@@ -209,12 +209,10 @@ $dokka.location:io.getunleash.android.metrics/MetricsCollector/count/#kotlin.Str
 $dokka.location:io.getunleash.android.metrics/MetricsCollector/countVariant/#kotlin.String#io.getunleash.android.data.Variant/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-collector/count-variant.html
 $dokka.location:io.getunleash.android.metrics/MetricsHandler///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-handler/index.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/index.html
-$dokka.location:io.getunleash.android.metrics/MetricsPayload/MetricsPayload/#kotlin.String#kotlin.String#io.getunleash.android.metrics.Bucket#kotlin.String?#kotlin.String?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/-metrics-payload.html
+$dokka.location:io.getunleash.android.metrics/MetricsPayload/MetricsPayload/#kotlin.String#kotlin.String#io.getunleash.android.metrics.Bucket/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/-metrics-payload.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload/appName/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/app-name.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload/bucket/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/bucket.html
 $dokka.location:io.getunleash.android.metrics/MetricsPayload/instanceId/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/instance-id.html
-$dokka.location:io.getunleash.android.metrics/MetricsPayload/sdkFlavour/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/sdk-flavour.html
-$dokka.location:io.getunleash.android.metrics/MetricsPayload/sdkFlavourVersion/#/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-payload/sdk-flavour-version.html
 $dokka.location:io.getunleash.android.metrics/MetricsReporter///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-reporter/index.html
 $dokka.location:io.getunleash.android.metrics/MetricsReporter/sendMetrics/#kotlin.Function1[kotlin.Result[kotlin.Unit],kotlin.Unit]?/PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-reporter/send-metrics.html
 $dokka.location:io.getunleash.android.metrics/MetricsSender.Companion///PointingToDeclaration/-unleash -android -s-d-k/io.getunleash.android.metrics/-metrics-sender/-companion/index.html
