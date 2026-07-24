@@ -50,8 +50,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import java.io.File
-import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -126,10 +126,10 @@ class DefaultUnleash(
                 )
             else NoOpMetrics()
         fetcher = UnleashFetcher(
-                unleashConfig,
-                httpClientBuilder.build("poller", unleashConfig.pollingStrategy),
-                unleashContextState.asStateFlow()
-            )
+            unleashConfig = unleashConfig,
+            httpClient = httpClientBuilder.build("poller", unleashConfig.pollingStrategy),
+            unleashContext = unleashContextState.asStateFlow()
+        )
         taskManager = LifecycleAwareTaskManager(
             dataJobs = buildDataJobs(metrics, fetcher),
             networkAvailable = networkStatusHelper.isAvailable(),
@@ -168,7 +168,9 @@ class DefaultUnleash(
             readyOnFeaturesReceived()
         }
         cache.subscribeTo(fetcher.getFeaturesReceivedFlow())
-        lifecycle.addObserver(taskManager)
+        coroutineScope.launch(Dispatchers.Main) {
+            lifecycle.addObserver(taskManager)
+        }
         if (bootstrapFile != null && bootstrapFile.exists()) {
             UnleashLogger.i(TAG, "Using provided bootstrap file")
             Parser.proxyResponseAdapter.fromJson(bootstrapFile.readText())?.let { state ->
