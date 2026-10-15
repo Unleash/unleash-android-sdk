@@ -7,6 +7,7 @@ import io.getunleash.android.data.UnleashContext
 import io.getunleash.android.data.UnleashState
 import io.getunleash.android.unleashScope
 import io.getunleash.android.util.UnleashLogger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -23,7 +24,8 @@ data class BackupState(val contextId: String, val toggles: Map<String, Toggle>)
  */
 open class LocalBackup(
     private val localDir: File,
-    private var lastContext: UnleashContext? = null
+    private var lastContext: UnleashContext? = null,
+    private val coroutineScope: CoroutineScope = unleashScope
 ) {
     companion object {
         private const val TAG = "LocalBackup"
@@ -32,7 +34,7 @@ open class LocalBackup(
     private val backupAdapter: JsonAdapter<BackupState> = moshi.adapter(BackupState::class.java)
 
     fun subscribeTo(state: Flow<UnleashState>) {
-        unleashScope.launch {
+        coroutineScope.launch {
             withContext(Dispatchers.IO) {
                 state.collect {
                     if (it.context != lastContext) {

@@ -9,6 +9,7 @@ import io.getunleash.android.errors.ServerException
 import io.getunleash.android.events.HeartbeatEvent
 import io.getunleash.android.http.Throttler
 import io.getunleash.android.unleashScope
+import kotlinx.coroutines.CoroutineScope
 import io.getunleash.android.util.UnleashLogger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
@@ -46,6 +47,7 @@ open class UnleashFetcher(
         unleashConfig: UnleashConfig,
         private val httpClient: OkHttpClient,
         private val unleashContext: StateFlow<UnleashContext>,
+        private val coroutineScope: CoroutineScope = unleashScope,
 ) : Closeable {
     companion object {
         private const val TAG = "UnleashFetcher"
@@ -78,7 +80,7 @@ open class UnleashFetcher(
     fun getFeaturesReceivedFlow() = featuresReceivedFlow.asSharedFlow()
 
     fun startWatchingContext() {
-        unleashScope.launch {
+        coroutineScope.launch {
             unleashContext.collect {
                 withContext(coroutineContextForContextChange) {
                     refreshTogglesIfContextChanged(it)

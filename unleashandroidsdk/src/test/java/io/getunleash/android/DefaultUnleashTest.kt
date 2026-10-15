@@ -35,6 +35,32 @@ class DefaultUnleashTest : BaseTest() {
     )
 
     @Test
+    fun closingOneInstanceDoesNotStopInstancesCreatedLater() {
+        val config = UnleashConfig.newBuilder("test-android-app")
+            .pollingStrategy.enabled(false)
+            .metricsStrategy.enabled(false)
+            .localStorageConfig.enabled(false)
+            .build()
+
+        val first = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = config,
+        )
+        first.start(bootstrap = staticToggleList)
+        first.close()
+
+        val second = DefaultUnleash(
+            androidContext = mock(Context::class.java),
+            unleashConfig = config,
+        )
+        second.start(bootstrap = staticToggleList)
+
+        await().atMost(2, TimeUnit.SECONDS).until { second.isReady() }
+        assertThat(second.isEnabled("feature1")).isTrue()
+        second.close()
+    }
+
+    @Test
     fun testDefaultUnleashWithStaticCache() {
         val unleash = DefaultUnleash(
             androidContext = mock(Context::class.java),
