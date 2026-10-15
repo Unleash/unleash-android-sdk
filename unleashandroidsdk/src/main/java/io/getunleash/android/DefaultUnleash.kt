@@ -45,7 +45,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -76,10 +78,14 @@ class DefaultUnleash(
         internal const val BACKUP_DIR_NAME = "unleash_backup"
     }
 
+    private val instanceJob = SupervisorJob(coroutineScope.coroutineContext[Job])
+    private val instanceScope = coroutineScope + instanceJob
+
     private val initialListeners: MutableList<UnleashListener> = mutableListOf()
 
     // allow tests in the same module to inject a custom LocalBackup for deterministic behavior
-    private var localBackupFactory: (File) -> LocalBackup = { dir -> LocalBackup(dir) }
+    private var localBackupFactory: (File) -> LocalBackup =
+        { dir -> LocalBackup(dir, coroutineScope = instanceScope) }
 
     // Internal constructor overload allowing injection of both localBackupFactory and fetcherFactory
     internal constructor(
@@ -104,7 +110,7 @@ class DefaultUnleash(
     private val unleashContextState = MutableStateFlow(unleashContext)
     private val metrics: MetricsHandler
     private val taskManager: LifecycleAwareTaskManager
-    private val cache: ObservableToggleCache = ObservableCache(cacheImpl, coroutineScope)
+    private val cache: ObservableToggleCache = ObservableCache(cacheImpl, instanceScope)
     private var started = AtomicBoolean(false)
     private var ready = AtomicBoolean(false)
     private val fetcher: UnleashFetcher
@@ -128,12 +134,13 @@ class DefaultUnleash(
         fetcher = UnleashFetcher(
                 unleashConfig,
                 httpClientBuilder.build("poller", unleashConfig.pollingStrategy),
-                unleashContextState.asStateFlow()
+                unleashContextState.asStateFlow(),
+                instanceScope
             )
         taskManager = LifecycleAwareTaskManager(
             dataJobs = buildDataJobs(metrics, fetcher),
             networkAvailable = networkStatusHelper.isAvailable(),
-            scope = coroutineScope
+            scope = instanceScope
         )
 
         if (!unleashConfig.delayedInitialization) {
@@ -154,6 +161,14 @@ class DefaultUnleash(
             UnleashLogger.w(TAG, "Unleash already started, ignoring start call")
             return
         }
+        if (!instanceScope.isActive) {
+            UnleashLogger.e(
+                TAG,
+                "Starting Unleash with a cancelled coroutine scope: it will never fetch " +
+                    "toggles and never become ready. Was the scope passed to the " +
+                    "constructor already cancelled?"
+            )
+        }
         initialListeners.forEach { addUnleashEventListener(it) }
         initialListeners.clear()
         eventListeners.forEach { addUnleashEventListener(it) }
@@ -164,7 +179,7 @@ class DefaultUnleash(
         if (unleashConfig.pollingStrategy.enabled) {
             fetcher.startWatchingContext()
         }
-        coroutineScope.launch {
+        instanceScope.launch {
             readyOnFeaturesReceived()
         }
         cache.subscribeTo(fetcher.getFeaturesReceivedFlow())
@@ -204,7 +219,7 @@ class DefaultUnleash(
     }.toImmutableList()
 
     private fun initializeLocalBackup() {
-        coroutineScope.launch {
+        instanceScope.launch {
             withContext(Dispatchers.IO) {
                 val backupDir =
                     CacheDirectoryProvider(unleashConfig.localStorageConfig, androidContext)
@@ -284,7 +299,7 @@ class DefaultUnleash(
     }
 
     private fun emit(impressionEvent: ImpressionEvent) {
-        coroutineScope.launch {
+        instanceScope.launch {
             impressionEventsFlow.emit(impressionEvent)
         }
     }
@@ -298,7 +313,7 @@ class DefaultUnleash(
     }
 
     override fun refreshTogglesNowAsync() {
-        coroutineScope.launch {
+        instanceScope.launch {
             withContext(Dispatchers.IO) {
                 fetcher.refreshToggles()
             }
@@ -316,7 +331,7 @@ class DefaultUnleash(
 
     override fun sendMetricsNowAsync() {
         if (!unleashConfig.metricsStrategy.enabled) return
-        coroutineScope.launch {
+        instanceScope.launch {
             withContext(Dispatchers.IO) {
                 metrics.sendMetrics()
             }
@@ -367,7 +382,7 @@ class DefaultUnleash(
     override fun addUnleashEventListener(listener: UnleashListener) {
 
         if (listener is UnleashReadyListener) {
-            val job = coroutineScope.launch {
+            val job = instanceScope.launch {
                 readyOnFeaturesReceived()
                 UnleashLogger.d(TAG, "Notifying UnleashReadyListener")
                 listener.onReady()
@@ -376,7 +391,7 @@ class DefaultUnleash(
         }
 
         if (listener is UnleashStateListener) {
-            val job = coroutineScope.launch {
+            val job = instanceScope.launch {
                 cache.getUpdatesFlow().collect {
                     listener.onStateChanged()
                 }
@@ -385,7 +400,7 @@ class DefaultUnleash(
         }
 
         if (listener is UnleashImpressionEventListener) {
-            val job = coroutineScope.launch {
+            val job = instanceScope.launch {
                 impressionEventsFlow.asSharedFlow().collect { event ->
                     listener.onImpression(event)
                 }
@@ -394,7 +409,7 @@ class DefaultUnleash(
         }
 
         if (listener is UnleashFetcherHeartbeatListener) {
-            val job = coroutineScope.launch {
+            val job = instanceScope.launch {
                 fetcher.getHeartbeatFlow().collect { event ->
                     if (event.status.isFailed()) {
                         listener.onError(event)
@@ -435,7 +450,7 @@ class DefaultUnleash(
         // cancel any remaining listener jobs (best-effort)
         listenerJobs.values.forEach { list -> list.forEach { it.cancel() } }
         listenerJobs.clear()
-        job.cancel("Unleash received closed signal")
+        instanceJob.cancel("Unleash received closed signal")
     }
 }
 
