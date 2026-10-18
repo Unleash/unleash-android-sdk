@@ -118,10 +118,7 @@ class NetworkStatusHelper(
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                    capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+            return isNetworkValidated(connectivityManager, activeNetwork)
         } else {
             @Suppress("DEPRECATION")
             val networkInfo = connectivityManager.activeNetworkInfo ?: return false
@@ -137,6 +134,24 @@ class NetworkStatusHelper(
             return null
         }
         return connectivityManager
+    }
+
+    private fun isNetworkValidated(
+        connectivityManager: ConnectivityManager,
+        network: Network
+    ): Boolean {
+        try {
+            val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                    capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+        } catch (exception: SecurityException) {
+            UnleashLogger.w(
+                TAG,
+                "Failed to get NetworkCapabilities assuming network is available",
+                exception
+            )
+            return true
+        }
     }
 
     private fun isAirplaneModeOn(): Boolean {
