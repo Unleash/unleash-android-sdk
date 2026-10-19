@@ -133,6 +133,35 @@ class NetworkStatusHelperTest : BaseTest() {
     }
 
     @Test
+    @Config(sdk = [23])
+    fun `when checking network state throws SecurityException assumes network is available`() {
+        val network = mock(Network::class.java)
+        val context = contextWithNetwork(network)
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        `when`(connectivityManager.getNetworkCapabilities(network))
+            .thenThrow(SecurityException("Package android does not belong to X"))
+
+        val networkStatusHelper = NetworkStatusHelper(context)
+
+        assertThat(networkStatusHelper.isAvailable()).isTrue()
+    }
+
+    @Test
+    @Config(sdk = [23])
+    fun `when network capabilities are null the network is not available`() {
+        val network = mock(Network::class.java)
+        val context = contextWithNetwork(network)
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        `when`(connectivityManager.getNetworkCapabilities(network)).thenReturn(null)
+
+        val networkStatusHelper = NetworkStatusHelper(context)
+
+        assertThat(networkStatusHelper.isAvailable()).isFalse()
+    }
+
+    @Test
     fun `retries registering callback when SecurityException occurs`() {
         val context = mock(Context::class.java)
         val connectivityManager = mock(ConnectivityManager::class.java)
